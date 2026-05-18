@@ -1,14 +1,14 @@
 ---
-name: recruit-squad-member
-description: Scaffold a brand-new squad member end-to-end — roster entry, mascot art, and agent file
+name: recruit-soldier
+description: Scaffold a brand-new soldier end-to-end — roster entry, mascot art, and agent file
 argument-hint: name=Quill animal=owl role="Scribe Agent"
 agent: agent
 tools: ['codebase', 'search', 'editFiles', 'runCommands', 'problems']
 ---
 
-# Skill — Recruit a new squad member
+# Skill — Recruit a new soldier
 
-You are recruiting a new teammate into the Copilot Squad. This is a **multi-file
+You are recruiting a new teammate into the Copilot Command Centre. This is a **multi-file
 scaffold** — when you finish, a new mascot should wander the navbar AND a new
 Copilot agent should exist. Do all of it, or none of it.
 
@@ -55,5 +55,5 @@ it before reporting done.
 ## Report
 
 End with a short recruitment report: the new member's name, the three files you
-created or edited, and the build status. Remind the user to reload Squad HQ to see
+created or edited, and the build status. Remind the user to reload Command Centre to see
 the new mascot, and to pick the new agent from the Copilot Chat agent dropdown.
