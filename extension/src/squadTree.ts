@@ -1,6 +1,9 @@
 /**
- * The Activity Bar sidebar: an "Army" tree of agents and a "Skills" tree of
- * prompt files. Both read the workspace `.github/` folder and refresh on demand.
+ * The Activity Bar sidebar — the army, shown natively in VS Code.
+ *
+ * An "Army" tree of agents (each with a live status) and a "Skills" tree of
+ * prompt files. Both read the workspace `.github/` folder. No webview — this
+ * is the extension's own surface, themed by VS Code.
  */
 
 import * as vscode from 'vscode';
@@ -15,19 +18,25 @@ class AgentItem extends vscode.TreeItem {
     role: string,
     blurb: string,
     recruited: boolean,
+    status: string | undefined,
     fileUri?: vscode.Uri,
   ) {
     super(label, vscode.TreeItemCollapsibleState.None);
-    this.description = recruited ? role : 'not recruited yet';
-    this.tooltip = new vscode.MarkdownString(`**${label}** — ${role}\n\n${blurb}`);
+    const working = status === 'working';
+    this.description = recruited
+      ? working
+        ? `${role}  ·  working…`
+        : role
+      : 'not recruited yet';
+    this.tooltip = new vscode.MarkdownString(
+      `**${label}** — ${role}\n\n${blurb}${working ? '\n\n_On a task…_' : ''}`,
+    );
     this.contextValue = 'agent';
-    this.iconPath = new vscode.ThemeIcon(recruited ? 'pass-filled' : 'circle-large-outline');
+    this.iconPath = new vscode.ThemeIcon(
+      working ? 'loading~spin' : recruited ? 'pass-filled' : 'circle-large-outline',
+    );
     if (recruited && fileUri) {
-      this.command = {
-        command: 'vscode.open',
-        title: 'Open agent file',
-        arguments: [fileUri],
-      };
+      this.command = { command: 'vscode.open', title: 'Open agent file', arguments: [fileUri] };
       this.resourceUri = fileUri;
     } else {
       this.command = { command: 'commandCentre.setup', title: 'Set up the army' };
@@ -38,8 +47,16 @@ class AgentItem extends vscode.TreeItem {
 export class SquadTreeProvider implements vscode.TreeDataProvider<AgentItem> {
   private readonly changed = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.changed.event;
+  private readonly statuses = new Map<string, string>();
 
   refresh(): void {
+    this.changed.fire();
+  }
+
+  /** Set (or clear, with undefined) an agent's live status, then refresh. */
+  setStatus(id: string, status: string | undefined): void {
+    if (status) this.statuses.set(id, status);
+    else this.statuses.delete(id);
     this.changed.fire();
   }
 
@@ -60,6 +77,7 @@ export class SquadTreeProvider implements vscode.TreeDataProvider<AgentItem> {
         agent.role,
         agent.blurb,
         Boolean(uri),
+        this.statuses.get(agent.id),
         uri,
       );
     });

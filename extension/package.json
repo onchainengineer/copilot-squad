@@ -44,11 +44,10 @@
     "viewsWelcome": [
       {
         "view": "commandCentre.roster",
-        "contents": "This workspace has no Copilot Command Centre yet.\n\nDeploy a full army of agents into `.github/` with one click.\n[Set Up the Army](command:commandCentre.setup)\n\nOr open the animated Command Centre to meet them first.\n[Open the Command Centre](command:commandCentre.openHQ)"
+        "contents": "This workspace has no Copilot Command Centre yet.\n\nDeploy a full army of agents into `.github/` with one click.\n[Set Up the Army](command:commandCentre.setup)"
       }
     ],
     "commands": [
-      { "command": "commandCentre.openHQ", "title": "Open the Command Centre", "category": "Copilot Command Centre", "icon": "$(window)" },
       { "command": "commandCentre.setup", "title": "Set Up the Army in This Workspace", "category": "Copilot Command Centre", "icon": "$(rocket)" },
       { "command": "commandCentre.recruit", "title": "Recruit a New Agent", "category": "Copilot Command Centre", "icon": "$(add)" },
       { "command": "commandCentre.refresh", "title": "Refresh the Army", "category": "Copilot Command Centre", "icon": "$(refresh)" },
@@ -59,7 +58,6 @@
     "menus": {
       "view/title": [
         { "command": "commandCentre.askSquad", "when": "view == commandCentre.roster", "group": "navigation@1" },
-        { "command": "commandCentre.openHQ", "when": "view == commandCentre.roster", "group": "navigation@2" },
         { "command": "commandCentre.recruit", "when": "view == commandCentre.roster", "group": "navigation@3" },
         { "command": "commandCentre.refresh", "when": "view == commandCentre.roster", "group": "navigation@4" }
       ],
@@ -76,7 +74,7 @@
           {
             "id": "meet",
             "title": "Meet the army",
-            "description": "Open the animated Command Centre and meet your six soldiers.\n[Open the Command Centre](command:commandCentre.openHQ)",
+            "description": "Open the Army sidebar and meet your six soldiers — each with a live status.\n[Open the Army Sidebar](command:workbench.view.extension.commandCentre)",
             "media": { "markdown": "walkthrough/01-meet.md" }
           },
           {

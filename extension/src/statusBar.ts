@@ -14,8 +14,8 @@ export class SquadStatusBar {
 
   constructor(context: vscode.ExtensionContext) {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    this.item.command = 'commandCentre.openHQ';
-    this.item.tooltip = 'Copilot Command Centre — open the Command Centre';
+    this.item.command = 'workbench.view.extension.commandCentre';
+    this.item.tooltip = 'Copilot Command Centre — open the Army sidebar';
     this.renderIdle();
     this.item.show();
     this.idleTimer = setInterval(() => this.renderIdle(), 4000);

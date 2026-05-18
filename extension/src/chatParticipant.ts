@@ -35,7 +35,10 @@ function showRoster(stream: vscode.ChatResponseStream): void {
     stream.markdown(`**${a.emoji} ${a.name}** — *${a.role}*\n${a.blurb}\n\n`);
   }
   stream.markdown('Hand me a task with `@army <your task>` and I’ll route it.\n');
-  stream.button({ command: 'commandCentre.openHQ', title: '🐾 Open the Command Centre' });
+  stream.button({
+    command: 'workbench.view.extension.commandCentre',
+    title: '🐾 Open the Army sidebar',
+  });
 }
 
 function showRecruit(stream: vscode.ChatResponseStream): void {

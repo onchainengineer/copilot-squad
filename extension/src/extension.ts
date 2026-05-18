@@ -1,15 +1,14 @@
 /**
  * Copilot Command Centre — extension entry point.
  *
- * Wires up the sidebar, the @army chat participant, the Command Centre
- * webview, the status-bar soldier, the scaffold commands, and the live
- * editor-event hooks.
+ * Wires up the native sidebar (the Army + Skills tree views), the @army chat
+ * participant, the status-bar soldier, the scaffold commands, and the live
+ * editor-event hooks. No webview — the army lives in VS Code's own surfaces.
  */
 
 import * as vscode from 'vscode';
 import { SquadTreeProvider, SkillTreeProvider } from './squadTree';
 import { registerChatParticipant } from './chatParticipant';
-import { SquadHQPanel } from './hqPanel';
 import { SquadStatusBar } from './statusBar';
 import { setupSquad, recruitAgent } from './scaffold';
 import { workspaceRoot } from './squadData';
@@ -44,21 +43,16 @@ export function activate(context: vscode.ExtensionContext): void {
   /* ── Commands ───────────────────────────────────────────── */
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('commandCentre.openHQ', () => SquadHQPanel.show(context)),
-
     vscode.commands.registerCommand('commandCentre.refresh', refresh),
 
     vscode.commands.registerCommand('commandCentre.setup', async () => {
       const count = await setupSquad(context.extensionUri);
       if (count < 0) return;
       refresh();
-      SquadHQPanel.cheer('Army deployed — six soldiers reporting for duty.');
       const action = await vscode.window.showInformationMessage(
         `🐾 Copilot Command Centre deployed — ${count} files written to .github/.`,
-        'Open the Command Centre',
         'Ask @army',
       );
-      if (action === 'Open the Command Centre') vscode.commands.executeCommand('commandCentre.openHQ');
       if (action === 'Ask @army') vscode.commands.executeCommand('commandCentre.askSquad');
     }),
 
@@ -66,7 +60,6 @@ export function activate(context: vscode.ExtensionContext): void {
       const recruit = await recruitAgent();
       if (!recruit) return;
       refresh();
-      SquadHQPanel.cheer(`${recruit.emoji} ${recruit.name} joined the army!`);
       vscode.window.showInformationMessage(
         `${recruit.emoji} ${recruit.name} recruited — agent file created in .github/agents/.`,
       );
@@ -100,23 +93,25 @@ export function activate(context: vscode.ExtensionContext): void {
     }),
   );
 
-  /* ── Live editor hooks — the soldiers react to what you do ──── */
+  /* ── Live editor hooks — agent status reflects what you do ── */
+
+  const clearTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((doc) => {
       if (doc.uri.scheme !== 'file') return;
-      const name = doc.uri.path.split('/').pop() ?? 'a file';
       const agentId = agentForFile(doc.uri.path);
       statusBar.flash(agentId);
-      SquadHQPanel.pulse(agentId, `saw you save ${name}`);
+      roster.setStatus(agentId, 'working');
+      clearTimeout(clearTimers.get(agentId));
+      clearTimers.set(
+        agentId,
+        setTimeout(() => roster.setStatus(agentId, undefined), 4200),
+      );
     }),
 
     vscode.workspace.onDidCreateFiles((e) => {
-      const newAgent = e.files.find((f) => f.path.endsWith('.agent.md'));
-      if (newAgent) {
-        refresh();
-        SquadHQPanel.cheer('A new agent file appeared — welcome aboard!');
-      }
+      if (e.files.some((f) => f.path.endsWith('.agent.md'))) refresh();
     }),
   );
 

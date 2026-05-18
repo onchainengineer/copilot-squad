@@ -1,11 +1,11 @@
 # 🐾 Copilot Command Centre — VS Code Extension
 
-> A command centre for your GitHub Copilot agents — animated soldier companions, a
+> A command centre for your GitHub Copilot agents — a native Army sidebar, a
 > routing `@army` chat participant, and one-click agent scaffolding.
 
 Copilot Command Centre turns custom GitHub Copilot agents into an **army you can see
-and command**. Six soldiers roam an animated command centre, react to what you
-do in the editor, and get put to work straight from VS Code.
+and command** — entirely in VS Code's own surfaces. No webview: the army lives in
+the Activity Bar sidebar, the status bar, and Copilot Chat.
 
 This is the companion extension for the **Copilot Command Centre workshop** —
 install it and you walk in with a working army already at your side.
@@ -25,13 +25,11 @@ from `.github/agents/`.
 @army /recruit                →  scaffold a new agent
 ```
 
-### 🐾 The Command Centre
-An animated webview where the soldiers roam, react to your **live editor activity**
-(save a file, watch the right agent light up), and can be put to work with a click.
-
 ### 🧭 The Army sidebar
-An Activity Bar view listing every agent and skill discovered in `.github/`.
-Click an agent to open its brain; click a skill to run it.
+A native Activity Bar view listing every agent and skill discovered in `.github/`.
+Each agent shows a **live status** — it flips to *working…* (with a spinner) when
+you save a file in that agent's domain. Click an agent to open its brain; click a
+skill to run it.
 
 ### 🚀 One-click scaffolding
 - **Set Up the Army** — deploys six ready-made agents, skills, and a shared
@@ -76,8 +74,7 @@ npm run compile
 ```
 
 Then press **F5** in VS Code to launch the Extension Development Host. Open the
-🐾 **Copilot Command Centre** icon in the Activity Bar, or run **Copilot Command
-Centre: Open the Command Centre** from the Command Palette.
+🐾 **Copilot Command Centre** icon in the Activity Bar to see the Army sidebar.
 
 To package a shareable `.vsix`:
 
@@ -91,7 +88,6 @@ npx @vscode/vsce package
 
 | Command | What it does |
 |---------|--------------|
-| `Copilot Command Centre: Open the Command Centre` | Opens the animated command centre |
 | `Copilot Command Centre: Set Up the Army in This Workspace` | Deploys the army into `.github/` |
 | `Copilot Command Centre: Recruit a New Agent` | Scaffolds a new `.agent.md` |
 | `Copilot Command Centre: Ask the Centre` | Opens Copilot Chat with `@army` |
