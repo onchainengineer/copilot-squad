@@ -96,6 +96,7 @@ export class SquadHQPanel {
 <body>
 <div id="app"></div>
 <script nonce="${n}">window.__SQUAD__ = ${squadJson};</script>
+<script nonce="${n}" src="${asset('sprites.js')}"></script>
 <script nonce="${n}" src="${asset('hq.js')}"></script>
 </body>
 </html>`;
