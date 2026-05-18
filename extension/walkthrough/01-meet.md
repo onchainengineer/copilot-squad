@@ -1,7 +1,7 @@
-# Meet the squad 🐾
+# Meet the army 🐾
 
-Your **Copilot Squad** is six specialist GitHub Copilot agents — each a mascot
-with one sharp job:
+Your **Copilot Command Centre** runs six specialist GitHub Copilot agents — each a
+soldier with one sharp job:
 
 - 🦊 **Scout** — recon: finds where things live
 - 🦫 **Hammer** — builder: ships features
@@ -10,5 +10,5 @@ with one sharp job:
 - 🐕 **Captain** — orchestrator: routes the mission
 - 🦉 **Quill** — scribe: writes the docs
 
-Open **Squad HQ** to watch them roam the command center — and see them react,
-live, as you save files and work in your editor.
+Open the **Command Centre** to watch them roam — and see them react, live, as you
+save files and work in your editor.

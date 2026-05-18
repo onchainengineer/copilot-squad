@@ -1,7 +1,7 @@
 /*
- * Squad sprite engine — original parametric mascot art.
+ * Soldier sprite engine — original parametric soldier art.
  *
- * Each mascot is a little standing creature drawn as an SVG. A "state" (walk /
+ * Each soldier is a little standing creature drawn as an SVG. A "state" (walk /
  * idle / cheer) is an 8-frame animation: this file generates the 8 frames by
  * varying pose parameters. The controller lays the frames in a strip and a CSS
  * steps() animation flips through them on the compositor — no per-frame JS.

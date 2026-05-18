@@ -10,7 +10,7 @@ Custom instructions shape *every* chat the same way. But real work needs
 is a persona you can pick from the Copilot Chat dropdown: it has a focused job,
 a **restricted set of tools**, and **handoffs** to teammates.
 
-The squad already has Scout, Hawk, and Patch. **Hammer the Builder is missing.**
+The army already has Scout, Hawk, and Patch. **Hammer the Builder is missing.**
 You're recruiting it.
 
 ## Step 1 — Study a worked example (2 min)
@@ -72,7 +72,7 @@ Then write the body. Give Hammer:
 - **An output format** — a short "🦫 Build report".
 
 💡 Don't overthink the prose. A custom agent is just a clear job description. Write
-it the way you'd brief a new hire.
+it the way you'd brief a new recruit.
 
 ## Step 3 — Put Hammer to work (2 min)
 

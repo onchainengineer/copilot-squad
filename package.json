@@ -1,8 +1,8 @@
 {
-  "name": "copilot-squad",
+  "name": "copilot-command-centre",
   "private": true,
   "version": "1.0.0",
-  "description": "Squad HQ — the playground for the Copilot Squad workshop",
+  "description": "Command Centre — the playground for the Copilot Command Centre workshop",
   "type": "module",
   "scripts": {
     "dev": "vite",

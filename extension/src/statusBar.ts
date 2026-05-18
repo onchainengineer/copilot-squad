@@ -1,5 +1,5 @@
 /**
- * The status-bar mascot — a small live presence for the squad.
+ * The status-bar soldier — a small live presence for the command centre.
  * Idle: cycles through the agents. On activity: flashes the working agent.
  */
 
@@ -14,8 +14,8 @@ export class SquadStatusBar {
 
   constructor(context: vscode.ExtensionContext) {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-    this.item.command = 'copilotSquad.openHQ';
-    this.item.tooltip = 'Copilot Squad — open HQ';
+    this.item.command = 'commandCentre.openHQ';
+    this.item.tooltip = 'Copilot Command Centre — open the Command Centre';
     this.renderIdle();
     this.item.show();
     this.idleTimer = setInterval(() => this.renderIdle(), 4000);
@@ -29,7 +29,7 @@ export class SquadStatusBar {
 
   private renderIdle(): void {
     const agent = SQUAD[this.cycle++ % SQUAD.length];
-    this.item.text = `${agent.emoji} Squad`;
+    this.item.text = `${agent.emoji} Army`;
   }
 
   /** Briefly show a specific agent as working. */

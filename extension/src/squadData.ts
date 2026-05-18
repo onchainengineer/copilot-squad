@@ -1,7 +1,7 @@
 /**
- * The squad roster + routing brain, shared across the extension.
+ * The army roster + routing brain, shared across the extension.
  *
- * The roster is embedded so the mascots, status bar, and routing work even
+ * The roster is embedded so the soldiers, status bar, and routing work even
  * before a workspace has any `.github/agents` files. When those files DO
  * exist, the extension reads the real persona from disk.
  */
@@ -12,7 +12,7 @@ export interface SquadAgent {
   id: string;
   name: string;
   role: string;
-  /** mascot emoji */
+  /** soldier emoji */
   emoji: string;
   animal: string;
   /** accent color, hex */
@@ -172,7 +172,7 @@ export async function readAgentPersona(id: string): Promise<string> {
   }
   if (!agent) return `You are a focused, helpful coding agent.`;
   return [
-    `You are **${agent.name}** ${agent.emoji}, the squad's ${agent.role}.`,
+    `You are **${agent.name}** ${agent.emoji}, the army's ${agent.role}.`,
     ``,
     `Your specialty: ${agent.blurb}`,
     ``,

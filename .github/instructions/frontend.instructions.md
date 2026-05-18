@@ -2,7 +2,7 @@
 applyTo: "src/**/*.ts"
 ---
 
-# Frontend instructions — Squad HQ app code
+# Frontend instructions — Command Centre app code
 
 These rules apply to any TypeScript file under `src/`. They load **on top of** the
 repo-wide `copilot-instructions.md` whenever an `src/**/*.ts` file is in context.
@@ -13,7 +13,7 @@ repo-wide `copilot-instructions.md` whenever an `src/**/*.ts` file is in context
   `addEventListener`, `querySelector`.
 - Build markup with template literals. Keep them readable.
 - When injecting text that could come from user input, do not interpolate it raw
-  into `innerHTML`. The squad roster data is trusted; user-typed strings are not.
+  into `innerHTML`. The army roster data is trusted; user-typed strings are not.
 
 ## Types
 

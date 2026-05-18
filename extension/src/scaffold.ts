@@ -1,7 +1,7 @@
 /**
- * Scaffold commands — give a workspace its own Copilot Squad.
+ * Scaffold commands — give a workspace its own Copilot Command Centre.
  *
- *  setupSquad   → copies the full squad (agents, skills, instructions) into `.github/`
+ *  setupSquad   → copies the full army (agents, skills, instructions) into `.github/`
  *  recruitAgent → interactively scaffolds one new `.github/agents/<id>.agent.md`
  */
 
@@ -46,18 +46,18 @@ async function copyDir(from: vscode.Uri, to: vscode.Uri): Promise<number> {
   return count;
 }
 
-/** Copy the full squad template set into the workspace `.github/` folder. */
+/** Copy the full army template set into the workspace `.github/` folder. */
 export async function setupSquad(extensionUri: vscode.Uri): Promise<number> {
   const root = workspaceRoot();
   if (!root) {
-    vscode.window.showErrorMessage('Open a folder first — the squad needs a workspace to deploy into.');
+    vscode.window.showErrorMessage('Open a folder first — the army needs a workspace to deploy into.');
     return -1;
   }
 
   const agentsDir = vscode.Uri.joinPath(root, '.github', 'agents');
   if (await exists(agentsDir)) {
     const choice = await vscode.window.showWarningMessage(
-      'This workspace already has a squad in `.github/agents`. Redeploy and overwrite?',
+      'This workspace already has an army in `.github/agents`. Redeploy and overwrite?',
       { modal: true },
       'Redeploy',
     );
@@ -110,7 +110,7 @@ tools: ['codebase', 'search', 'usages', 'editFiles']
 
 # ${o.name} ${o.emoji} — ${o.role}
 
-You are **${o.name}**, a member of the Copilot Squad. ${o.specialty}
+You are **${o.name}**, a soldier in the Copilot Command Centre army. ${o.specialty}
 
 ## Your one job
 
@@ -155,7 +155,7 @@ export async function recruitAgent(): Promise<
 
   const animal = await vscode.window.showQuickPick(
     Object.keys(ANIMALS).map((a) => ({ label: `${ANIMALS[a]}  ${a}`, animal: a })),
-    { title: 'Recruit a New Agent (2/4)', placeHolder: 'Pick a mascot animal' },
+    { title: 'Recruit a New Agent (2/4)', placeHolder: 'Pick an animal' },
   );
   if (!animal) return undefined;
 

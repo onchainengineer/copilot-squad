@@ -1,4 +1,4 @@
-# Copilot Squad — Repository Instructions
+# Copilot Command Centre — Repository Instructions
 
 <!--
   LAB 1 ▸ This file is loaded into EVERY Copilot Chat request in this repo.
@@ -10,8 +10,8 @@
 
 ## What this project is
 
-TODO: Describe Squad HQ in 2–3 sentences — what the app is, and that it is the
-playground for the Copilot Squad workshop.
+TODO: Describe Command Centre in 2–3 sentences — what the app is, and that it is the
+playground for the Copilot Command Centre workshop.
 
 ## Tech stack
 
@@ -30,7 +30,7 @@ TODO: State the conventions Copilot must follow — TypeScript strict, no `any`,
 explicit types on exports, 2-space indent, single quotes, semicolons, comments
 explain *why* not *what*, never break the build (`npm run build` stays green).
 
-## How the squad works
+## How the army works
 
-TODO: Explain that each squad member is a custom agent in `.github/agents/`,
+TODO: Explain that each soldier is a custom agent in `.github/agents/`,
 reusable skills live in `.github/prompts/`, and each agent stays in its lane.

@@ -1,10 +1,11 @@
 /**
- * Squad HQ — entry point. Builds the page and wires every panel to the shared
- * MissionEngine, so the Deck and the dashboard animate from the same events.
+ * Command Centre — entry point. Builds the page and wires every panel to the
+ * shared MissionEngine, so the Deck and the dashboard animate from the same
+ * events.
  *
- * This is the *playground* for the Copilot Squad workshop. You don't edit this
- * file in the labs — your job is to build the agents in `.github/` that operate
- * on this app. (LAB 4 ends with the squad editing it for you.)
+ * This is the *playground* for the Copilot Command Centre workshop. You don't
+ * edit this file in the labs — your job is to build the agents in `.github/`
+ * that operate on this app. (LAB 4 ends with the army editing it for you.)
  */
 
 import './style.css';
@@ -21,7 +22,8 @@ app.innerHTML = `
     <div class="deck-brand">
       <span class="deck-paw">🐾</span>
       <div>
-        <h1>Copilot Squad</h1>
+        <span class="deck-eyebrow">Copilot</span>
+        <h1>Command Centre</h1>
         <p>${squad.length} agents on duty</p>
       </div>
     </div>
@@ -32,20 +34,22 @@ app.innerHTML = `
     <section class="hud" id="hud"></section>
 
     <section class="panel">
-      <h2><span class="panel-dot"></span>Mission Control</h2>
-      <p class="panel-sub">Hand the squad a task. Watch them run it as a live relay — recon, build, review — with real handoffs.</p>
+      <span class="eyebrow">Mission Control</span>
+      <h2><span class="panel-dot"></span>Deploy the army</h2>
+      <p class="panel-sub lede">Hand the army a task. Watch them run it as a live relay — recon, build, review — with real handoffs.</p>
       <div id="mission-control"></div>
     </section>
 
     <section class="panel">
-      <h2><span class="panel-dot"></span>The Roster</h2>
-      <p class="panel-sub">Every pet is a real Copilot agent — its brain lives in <code>.github/agents/</code>.</p>
+      <span class="eyebrow">The Roster</span>
+      <h2><span class="panel-dot"></span>Agents on duty</h2>
+      <p class="panel-sub lede">Every soldier is a real Copilot agent — its brain lives in <code>.github/agents/</code>.</p>
       <div class="roster-grid" id="roster"></div>
     </section>
   </main>
 
   <footer class="hq-foot">
-    Built in the <strong>Copilot Squad</strong> workshop · the pets are your agents · go give them a brain
+    Built in the <strong>Copilot Command Centre</strong> workshop · the soldiers are your agents · go give them a brain
   </footer>`;
 
 mountDeck(document.querySelector<HTMLElement>('#deck-track')!, engine, (id) => {

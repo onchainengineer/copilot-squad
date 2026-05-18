@@ -1,9 +1,9 @@
 {
-  "name": "copilot-squad",
-  "displayName": "Copilot Squad",
-  "description": "Your own squad of GitHub Copilot agents — mascot companions, a routing @squad chat participant, and one-click agent scaffolding.",
+  "name": "copilot-command-centre",
+  "displayName": "Copilot Command Centre",
+  "description": "A command centre for your GitHub Copilot agents — soldier companions, a routing @army chat participant, and one-click agent scaffolding.",
   "version": "0.1.0",
-  "publisher": "copilot-squad",
+  "publisher": "copilot-command-centre",
   "license": "MIT",
   "engines": {
     "vscode": "^1.96.0"
@@ -15,86 +15,86 @@
   "contributes": {
     "chatParticipants": [
       {
-        "id": "copilot-squad.squad",
-        "name": "squad",
-        "fullName": "Copilot Squad",
-        "description": "Hand the squad a task — the Captain routes it to the right agent",
+        "id": "copilot-command-centre.army",
+        "name": "army",
+        "fullName": "Copilot Command Centre",
+        "description": "Hand the army a task — the Captain routes it to the right soldier",
         "isSticky": true,
         "commands": [
-          { "name": "roster", "description": "List every agent in the squad" },
-          { "name": "recruit", "description": "Scaffold a brand-new squad agent" }
+          { "name": "roster", "description": "List every agent in the army" },
+          { "name": "recruit", "description": "Scaffold a brand-new agent" }
         ]
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "copilotSquad",
-          "title": "Copilot Squad",
+          "id": "commandCentre",
+          "title": "Copilot Command Centre",
           "icon": "media/squad-icon.svg"
         }
       ]
     },
     "views": {
-      "copilotSquad": [
-        { "id": "copilotSquad.roster", "name": "Squad", "icon": "media/squad-icon.svg" },
-        { "id": "copilotSquad.skills", "name": "Skills" }
+      "commandCentre": [
+        { "id": "commandCentre.roster", "name": "Army", "icon": "media/squad-icon.svg" },
+        { "id": "commandCentre.skills", "name": "Skills" }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "copilotSquad.roster",
-        "contents": "This workspace has no Copilot Squad yet.\n\nDeploy a full squad of agents into `.github/` with one click.\n[Set Up the Squad](command:copilotSquad.setup)\n\nOr open the animated HQ to meet them first.\n[Open Squad HQ](command:copilotSquad.openHQ)"
+        "view": "commandCentre.roster",
+        "contents": "This workspace has no Copilot Command Centre yet.\n\nDeploy a full army of agents into `.github/` with one click.\n[Set Up the Army](command:commandCentre.setup)\n\nOr open the animated Command Centre to meet them first.\n[Open the Command Centre](command:commandCentre.openHQ)"
       }
     ],
     "commands": [
-      { "command": "copilotSquad.openHQ", "title": "Open Squad HQ", "category": "Copilot Squad", "icon": "$(window)" },
-      { "command": "copilotSquad.setup", "title": "Set Up the Squad in This Workspace", "category": "Copilot Squad", "icon": "$(rocket)" },
-      { "command": "copilotSquad.recruit", "title": "Recruit a New Agent", "category": "Copilot Squad", "icon": "$(add)" },
-      { "command": "copilotSquad.refresh", "title": "Refresh the Squad", "category": "Copilot Squad", "icon": "$(refresh)" },
-      { "command": "copilotSquad.openAgent", "title": "Open Agent File", "category": "Copilot Squad" },
-      { "command": "copilotSquad.askSquad", "title": "Ask the Squad (@squad)", "category": "Copilot Squad", "icon": "$(comment-discussion)" },
-      { "command": "copilotSquad.runSkill", "title": "Run Skill", "category": "Copilot Squad" }
+      { "command": "commandCentre.openHQ", "title": "Open the Command Centre", "category": "Copilot Command Centre", "icon": "$(window)" },
+      { "command": "commandCentre.setup", "title": "Set Up the Army in This Workspace", "category": "Copilot Command Centre", "icon": "$(rocket)" },
+      { "command": "commandCentre.recruit", "title": "Recruit a New Agent", "category": "Copilot Command Centre", "icon": "$(add)" },
+      { "command": "commandCentre.refresh", "title": "Refresh the Army", "category": "Copilot Command Centre", "icon": "$(refresh)" },
+      { "command": "commandCentre.openAgent", "title": "Open Agent File", "category": "Copilot Command Centre" },
+      { "command": "commandCentre.askSquad", "title": "Ask the Centre (@army)", "category": "Copilot Command Centre", "icon": "$(comment-discussion)" },
+      { "command": "commandCentre.runSkill", "title": "Run Skill", "category": "Copilot Command Centre" }
     ],
     "menus": {
       "view/title": [
-        { "command": "copilotSquad.askSquad", "when": "view == copilotSquad.roster", "group": "navigation@1" },
-        { "command": "copilotSquad.openHQ", "when": "view == copilotSquad.roster", "group": "navigation@2" },
-        { "command": "copilotSquad.recruit", "when": "view == copilotSquad.roster", "group": "navigation@3" },
-        { "command": "copilotSquad.refresh", "when": "view == copilotSquad.roster", "group": "navigation@4" }
+        { "command": "commandCentre.askSquad", "when": "view == commandCentre.roster", "group": "navigation@1" },
+        { "command": "commandCentre.openHQ", "when": "view == commandCentre.roster", "group": "navigation@2" },
+        { "command": "commandCentre.recruit", "when": "view == commandCentre.roster", "group": "navigation@3" },
+        { "command": "commandCentre.refresh", "when": "view == commandCentre.roster", "group": "navigation@4" }
       ],
       "view/item/context": [
-        { "command": "copilotSquad.askSquad", "when": "view == copilotSquad.roster && viewItem == agent", "group": "inline" }
+        { "command": "commandCentre.askSquad", "when": "view == commandCentre.roster && viewItem == agent", "group": "inline" }
       ]
     },
     "walkthroughs": [
       {
-        "id": "copilotSquad.gettingStarted",
-        "title": "Assemble Your Copilot Squad",
-        "description": "Deploy a squad of custom GitHub Copilot agents and put them to work.",
+        "id": "commandCentre.gettingStarted",
+        "title": "Assemble Your Copilot Command Centre",
+        "description": "Deploy an army of custom GitHub Copilot agents and put them to work.",
         "steps": [
           {
             "id": "meet",
-            "title": "Meet the squad",
-            "description": "Open the animated Squad HQ and meet your six agent mascots.\n[Open Squad HQ](command:copilotSquad.openHQ)",
+            "title": "Meet the army",
+            "description": "Open the animated Command Centre and meet your six soldiers.\n[Open the Command Centre](command:commandCentre.openHQ)",
             "media": { "markdown": "walkthrough/01-meet.md" }
           },
           {
             "id": "setup",
-            "title": "Deploy the squad",
-            "description": "Scaffold the agent files into this workspace's `.github/` folder.\n[Set Up the Squad](command:copilotSquad.setup)",
+            "title": "Deploy the army",
+            "description": "Scaffold the agent files into this workspace's `.github/` folder.\n[Set Up the Army](command:commandCentre.setup)",
             "media": { "markdown": "walkthrough/02-setup.md" }
           },
           {
             "id": "ask",
             "title": "Put them to work",
-            "description": "Open Copilot Chat and hand the squad a mission with `@squad`.\n[Ask the Squad](command:copilotSquad.askSquad)",
+            "description": "Open Copilot Chat and hand the army a mission with `@army`.\n[Ask the Centre](command:commandCentre.askSquad)",
             "media": { "markdown": "walkthrough/03-ask.md" }
           },
           {
             "id": "recruit",
             "title": "Recruit your own agent",
-            "description": "Build a brand-new teammate, tuned to your project.\n[Recruit an Agent](command:copilotSquad.recruit)",
+            "description": "Build a brand-new teammate, tuned to your project.\n[Recruit an Agent](command:commandCentre.recruit)",
             "media": { "markdown": "walkthrough/04-recruit.md" }
           }
         ]
