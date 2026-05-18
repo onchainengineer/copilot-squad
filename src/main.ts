@@ -20,6 +20,7 @@ app.innerHTML = `
   <main class="page" id="top">
     <section class="hero">
       <span class="hero-badge">⌘</span>
+      <span class="hero-eyebrow">Copilot · Command Centre</span>
       <h1>Your Copilot army, <span>on call.</span></h1>
       <p class="hero-sub">Six custom GitHub Copilot agents — each a specialist. Pick one, brief it a task, and watch it work.</p>
     </section>
