@@ -1,17 +1,20 @@
 /**
- * Squad HQ — entry point. Assembles the page and wires the panels together.
+ * Squad HQ — entry point. Builds the page and wires every panel to the shared
+ * MissionEngine, so the Deck and the dashboard animate from the same events.
  *
- * This is the *playground* for the Copilot Squad workshop. You don't need to
- * touch this file in the labs — your job is to build the agents in `.github/`
- * that operate on this app. (LAB 4 ends with the squad editing it for you.)
+ * This is the *playground* for the Copilot Squad workshop. You don't edit this
+ * file in the labs — your job is to build the agents in `.github/` that operate
+ * on this app. (LAB 4 ends with the squad editing it for you.)
  */
 
 import './style.css';
 import { squad } from './squad';
+import { MissionEngine } from './missions';
 import { mountDeck } from './navbar';
-import { renderRoster, renderMissionControl, startComms } from './dashboard';
+import { renderHud, renderMissionControl, renderRoster } from './dashboard';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
+const engine = new MissionEngine();
 
 app.innerHTML = `
   <header class="deck">
@@ -26,21 +29,18 @@ app.innerHTML = `
   </header>
 
   <main class="hq">
-    <section class="panel panel-mc">
+    <section class="hud" id="hud"></section>
+
+    <section class="panel">
       <h2><span class="panel-dot"></span>Mission Control</h2>
-      <p class="panel-sub">Hand the Captain a task. They'll route it to the right teammate.</p>
+      <p class="panel-sub">Hand the squad a task. Watch them run it as a live relay — recon, build, review — with real handoffs.</p>
       <div id="mission-control"></div>
     </section>
 
-    <section class="panel panel-roster">
+    <section class="panel">
       <h2><span class="panel-dot"></span>The Roster</h2>
-      <p class="panel-sub">Every pet is a real Copilot agent — its file lives in <code>.github/agents/</code>.</p>
+      <p class="panel-sub">Every pet is a real Copilot agent — its brain lives in <code>.github/agents/</code>.</p>
       <div class="roster-grid" id="roster"></div>
-    </section>
-
-    <section class="panel panel-comms">
-      <h2><span class="panel-dot"></span>Squad Comms</h2>
-      <div class="comms-feed" id="comms"></div>
     </section>
   </main>
 
@@ -48,17 +48,15 @@ app.innerHTML = `
     Built in the <strong>Copilot Squad</strong> workshop · the pets are your agents · go give them a brain
   </footer>`;
 
-const track = document.querySelector<HTMLElement>('#deck-track')!;
-
-mountDeck(track, (id) => {
+mountDeck(document.querySelector<HTMLElement>('#deck-track')!, engine, (id) => {
   const card = document.querySelector(`#card-${id}`);
   if (!card) return;
   card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   card.classList.remove('ping');
-  void (card as HTMLElement).offsetWidth; // restart the animation
+  void (card as HTMLElement).offsetWidth;
   card.classList.add('ping');
 });
 
-renderRoster(document.querySelector<HTMLElement>('#roster')!);
-renderMissionControl(document.querySelector<HTMLElement>('#mission-control')!);
-startComms(document.querySelector<HTMLElement>('#comms')!);
+renderHud(document.querySelector<HTMLElement>('#hud')!, engine);
+renderMissionControl(document.querySelector<HTMLElement>('#mission-control')!, engine);
+renderRoster(document.querySelector<HTMLElement>('#roster')!, engine);
