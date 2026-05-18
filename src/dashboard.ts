@@ -1,38 +1,51 @@
 /**
- * COMMAND CENTRE — the dashboard below the Deck.
+ * Command Centre dashboard panels — Grafana-style.
  *
- *  - HUD:            live mission / handoff / army counters.
- *  - Mission Control: assign a task; watch the army run it as a live relay.
- *  - Roster:         one card per agent, with live status and a mission count.
+ *  renderStats         · the stat-tile row
+ *  renderMissionControl· assign a mission, watch the relay
+ *  renderSoldierStatus · live status table of the army
+ *  renderThroughput    · missions handled, per soldier
+ *  renderOpsLog        · operations timeline
  *
- * Every panel subscribes to the shared MissionEngine and animates on its events.
+ * Every panel subscribes to the shared MissionEngine.
  */
 
-import { squad, getMember, type SquadMember } from './squad';
+import { squad, getMember } from './squad';
 import { mascotSvg } from './mascots';
 import { MissionEngine, SAMPLE_MISSIONS } from './missions';
 
-/* ── HUD ──────────────────────────────────────────────────── */
+/* ── Stat tiles ───────────────────────────────────────────── */
 
-export function renderHud(host: HTMLElement, engine: MissionEngine): void {
-  host.innerHTML = `
-    <div class="hud-stat"><span class="hud-num" id="hud-missions">0</span><span class="hud-label">Missions run</span></div>
-    <div class="hud-stat"><span class="hud-num" id="hud-handoffs">0</span><span class="hud-label">Handoffs</span></div>
-    <div class="hud-stat"><span class="hud-num">${squad.length}</span><span class="hud-label">Agents ready</span></div>`;
+export function renderStats(host: HTMLElement, engine: MissionEngine): void {
+  const tiles = [
+    { id: 'missions', label: 'Missions run', value: () => engine.stats.missions },
+    { id: 'handoffs', label: 'Handoffs', value: () => engine.stats.handoffs },
+    { id: 'steps', label: 'Steps executed', value: () => engine.stats.steps },
+    { id: 'onduty', label: 'Soldiers on duty', value: () => squad.length },
+  ];
+  host.innerHTML = tiles
+    .map(
+      (t) => `
+      <div class="gf-stat">
+        <span class="gf-stat-num" id="stat-${t.id}">${t.value()}</span>
+        <span class="gf-stat-label">${t.label}</span>
+      </div>`,
+    )
+    .join('');
 
-  const missionsEl = host.querySelector('#hud-missions') as HTMLElement;
-  const handoffsEl = host.querySelector('#hud-handoffs') as HTMLElement;
-
-  const bump = (el: HTMLElement, value: number) => {
-    el.textContent = String(value);
+  const bump = (id: string, v: number) => {
+    const el = host.querySelector(`#stat-${id}`);
+    if (!el) return;
+    el.textContent = String(v);
     el.classList.remove('bump');
-    void el.offsetWidth;
+    void (el as HTMLElement).offsetWidth;
     el.classList.add('bump');
   };
 
   engine.subscribe((e) => {
-    if (e.type === 'handoff') bump(handoffsEl, engine.stats.handoffs);
-    if (e.type === 'complete') bump(missionsEl, engine.stats.missions);
+    if (e.type === 'handoff') bump('handoffs', engine.stats.handoffs);
+    if (e.type === 'step-done') bump('steps', engine.stats.steps);
+    if (e.type === 'complete') bump('missions', engine.stats.missions);
   });
 }
 
@@ -47,7 +60,7 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
   host.innerHTML = `
     <form class="mc-form" autocomplete="off">
       <input class="mc-input" name="mission" placeholder="Assign a mission to the army…  e.g. “build a settings page”" />
-      <button class="mc-go" type="submit">Deploy army →</button>
+      <button class="mc-go" type="submit">Deploy the army →</button>
     </form>
     <div class="mc-chips">
       ${SAMPLE_MISSIONS.map(
@@ -72,7 +85,7 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
   const setLocked = (locked: boolean) => {
     input.disabled = locked;
     go.disabled = locked;
-    go.textContent = locked ? 'Army deployed…' : 'Deploy army →';
+    go.textContent = locked ? 'Army deployed…' : 'Deploy the army →';
     chips.forEach((c) => (c.disabled = locked));
   };
 
@@ -86,9 +99,7 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
     e.preventDefault();
     launch(input.value);
   });
-  chips.forEach((chip) =>
-    chip.addEventListener('click', () => launch(chip.dataset.mission ?? '')),
-  );
+  chips.forEach((chip) => chip.addEventListener('click', () => launch(chip.dataset.mission ?? '')));
 
   engine.subscribe((e) => {
     if (e.type === 'plan') {
@@ -109,26 +120,19 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
         })
         .join('');
     }
-
     if (e.type === 'step-start') {
-      const node = stepper.querySelector(`.step[data-i="${e.index}"]`);
-      node?.classList.replace('pending', 'running');
+      stepper.querySelector(`.step[data-i="${e.index}"]`)?.classList.replace('pending', 'running');
     }
-
     if (e.type === 'log') {
       const m = getMember(e.agentId);
       log.querySelector('.log-line.live')?.classList.remove('live');
       const line = document.createElement('div');
       line.className = 'log-line live';
       line.style.setProperty('--accent', m?.color ?? '#888');
-      line.innerHTML = `
-        ${mini(e.agentId)}
-        <span class="log-agent">${m?.name ?? e.agentId}</span>
-        <span class="log-text">${e.text}</span>`;
+      line.innerHTML = `${mini(e.agentId)}<span class="log-agent">${m?.name ?? e.agentId}</span><span class="log-text">${e.text}</span>`;
       log.appendChild(line);
       log.scrollTop = log.scrollHeight;
     }
-
     if (e.type === 'step-done') {
       const node = stepper.querySelector(`.step[data-i="${e.index}"]`);
       node?.classList.remove('running');
@@ -136,7 +140,6 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
       const link = node?.previousElementSibling;
       if (link?.classList.contains('step-link')) link.classList.add('done');
     }
-
     if (e.type === 'complete') {
       setLocked(false);
       log.querySelector('.log-line.live')?.classList.remove('live');
@@ -146,45 +149,105 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
   });
 }
 
-/* ── Roster ───────────────────────────────────────────────── */
+/* ── Soldier Status table ─────────────────────────────────── */
 
-function card(member: SquadMember): string {
-  return `
-    <article class="agent-card" id="card-${member.id}" style="--accent:${member.color}">
-      <div class="agent-card-glow"></div>
-      <div class="agent-mascot">${mascotSvg(member)}</div>
-      <div class="agent-meta">
-        <h3>${member.name}</h3>
-        <p class="agent-role">${member.role}</p>
-        <p class="agent-specialty">${member.specialty}</p>
-        <code class="agent-file">.github/agents/${member.id}.agent.md</code>
-      </div>
-      <div class="agent-side">
-        <span class="agent-pill" data-status="idle">Idle</span>
-        <span class="agent-runs"><b id="runs-${member.id}">0</b> missions</span>
-      </div>
-    </article>`;
-}
+export function renderSoldierStatus(host: HTMLElement, engine: MissionEngine): void {
+  host.innerHTML = `
+    <div class="ss-table">
+      <div class="ss-head"><span>Soldier</span><span>Status</span><span>Missions</span></div>
+      ${squad
+        .map(
+          (m) => `
+        <div class="ss-row" id="ss-${m.id}" style="--accent:${m.color}">
+          <span class="ss-soldier">${mascotSvg(m)}<span class="ss-meta"><b>${m.name}</b><em>${m.role}</em></span></span>
+          <span class="ss-status" data-status="idle"><i></i>Idle</span>
+          <span class="ss-missions"><b id="ssm-${m.id}">0</b></span>
+        </div>`,
+        )
+        .join('')}
+    </div>`;
 
-export function renderRoster(host: HTMLElement, engine: MissionEngine): void {
-  host.innerHTML = squad.map(card).join('');
   const runs: Record<string, number> = {};
-
-  const setStatus = (id: string, status: 'idle' | 'working' | 'done') => {
-    const pill = host.querySelector(`#card-${id} .agent-pill`) as HTMLElement | null;
-    if (!pill) return;
-    pill.dataset.status = status;
-    pill.textContent = status === 'idle' ? 'Idle' : status === 'working' ? 'Working' : 'Done ✓';
+  const set = (id: string, status: 'idle' | 'working' | 'done', label: string) => {
+    const cell = host.querySelector(`#ss-${id} .ss-status`) as HTMLElement | null;
+    if (!cell) return;
+    cell.dataset.status = status;
+    cell.innerHTML = `<i></i>${label}`;
   };
 
   engine.subscribe((e) => {
-    if (e.type === 'step-start') setStatus(e.step.agentId, 'working');
+    if (e.type === 'step-start') set(e.step.agentId, 'working', e.step.action);
     if (e.type === 'step-done') {
-      setStatus(e.step.agentId, 'done');
+      set(e.step.agentId, 'done', 'Done');
       runs[e.step.agentId] = (runs[e.step.agentId] ?? 0) + 1;
-      const counter = host.querySelector(`#runs-${e.step.agentId}`);
-      if (counter) counter.textContent = String(runs[e.step.agentId]);
+      const c = host.querySelector(`#ssm-${e.step.agentId}`);
+      if (c) c.textContent = String(runs[e.step.agentId]);
     }
-    if (e.type === 'complete') squad.forEach((m) => setStatus(m.id, 'idle'));
+    if (e.type === 'complete') squad.forEach((m) => set(m.id, 'idle', 'Idle'));
+  });
+}
+
+/* ── Throughput bars ──────────────────────────────────────── */
+
+export function renderThroughput(host: HTMLElement, engine: MissionEngine): void {
+  host.innerHTML = `<div class="tp">${squad
+    .map(
+      (m) => `
+      <div class="tp-row" style="--accent:${m.color}">
+        <span class="tp-name">${m.name}</span>
+        <span class="tp-track"><span class="tp-bar" id="tp-${m.id}"></span></span>
+        <span class="tp-val" id="tpv-${m.id}">0</span>
+      </div>`,
+    )
+    .join('')}</div>`;
+
+  const runs: Record<string, number> = {};
+  engine.subscribe((e) => {
+    if (e.type !== 'step-done') return;
+    runs[e.step.agentId] = (runs[e.step.agentId] ?? 0) + 1;
+    const max = Math.max(1, ...Object.values(runs));
+    for (const id of Object.keys(runs)) {
+      const bar = host.querySelector(`#tp-${id}`) as HTMLElement | null;
+      const val = host.querySelector(`#tpv-${id}`);
+      if (bar) bar.style.width = `${(runs[id] / max) * 100}%`;
+      if (val) val.textContent = String(runs[id]);
+    }
+  });
+}
+
+/* ── Operations log ───────────────────────────────────────── */
+
+export function renderOpsLog(host: HTMLElement, engine: MissionEngine): void {
+  const countEl = document.getElementById('ops-count');
+  let total = 0;
+
+  const push = (accent: string, tag: string, text: string) => {
+    total++;
+    if (countEl) countEl.textContent = `${total} event${total === 1 ? '' : 's'}`;
+    const row = document.createElement('div');
+    row.className = 'ops-line';
+    row.style.setProperty('--accent', accent);
+    const time = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    row.innerHTML = `<span class="ops-time">${time}</span><span class="ops-tag">${tag}</span><span class="ops-text">${text}</span>`;
+    host.insertBefore(row, host.firstChild);
+    while (host.children.length > 14) host.lastChild?.remove();
+  };
+
+  engine.subscribe((e) => {
+    if (e.type === 'plan') push('#58a6ff', 'MISSION', `Assigned — “${e.mission}”`);
+    else if (e.type === 'step-start') {
+      const m = getMember(e.step.agentId);
+      push(m?.color ?? '#888', 'DISPATCH', `${m?.name ?? e.step.agentId} → ${e.step.action}`);
+    } else if (e.type === 'handoff') {
+      const from = getMember(e.from);
+      const to = getMember(e.to);
+      push('#bc8cff', 'HANDOFF', `${from?.name ?? e.from} → ${to?.name ?? e.to}`);
+    } else if (e.type === 'complete') {
+      push('#3fb950', 'COMPLETE', 'Mission complete — army stood down');
+    }
   });
 }
