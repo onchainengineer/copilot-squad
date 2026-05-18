@@ -1,8 +1,8 @@
 /**
- * SQUAD HQ — the dashboard below the Deck.
+ * COMMAND CENTRE — the dashboard below the Deck.
  *
- *  - HUD:            live mission / handoff / squad counters.
- *  - Mission Control: assign a task; watch the squad run it as a live relay.
+ *  - HUD:            live mission / handoff / army counters.
+ *  - Mission Control: assign a task; watch the army run it as a live relay.
  *  - Roster:         one card per agent, with live status and a mission count.
  *
  * Every panel subscribes to the shared MissionEngine and animates on its events.
@@ -46,8 +46,8 @@ function mini(id: string): string {
 export function renderMissionControl(host: HTMLElement, engine: MissionEngine): void {
   host.innerHTML = `
     <form class="mc-form" autocomplete="off">
-      <input class="mc-input" name="mission" placeholder="Assign a mission to the squad…  e.g. “build a settings page”" />
-      <button class="mc-go" type="submit">Deploy squad →</button>
+      <input class="mc-input" name="mission" placeholder="Assign a mission to the army…  e.g. “build a settings page”" />
+      <button class="mc-go" type="submit">Deploy army →</button>
     </form>
     <div class="mc-chips">
       ${SAMPLE_MISSIONS.map(
@@ -57,7 +57,7 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
     <div class="run" hidden>
       <div class="run-stepper" id="run-stepper"></div>
       <div class="run-log" id="run-log"></div>
-      <div class="run-banner" id="run-banner" hidden>✓ Mission complete — squad stood down</div>
+      <div class="run-banner" id="run-banner" hidden>✓ Mission complete — army stood down</div>
     </div>`;
 
   const form = host.querySelector('.mc-form') as HTMLFormElement;
@@ -72,7 +72,7 @@ export function renderMissionControl(host: HTMLElement, engine: MissionEngine): 
   const setLocked = (locked: boolean) => {
     input.disabled = locked;
     go.disabled = locked;
-    go.textContent = locked ? 'Squad deployed…' : 'Deploy squad →';
+    go.textContent = locked ? 'Army deployed…' : 'Deploy army →';
     chips.forEach((c) => (c.disabled = locked));
   };
 

@@ -1,10 +1,10 @@
 /**
- * THE DECK — the animated navbar where the squad mascots live.
+ * THE DECK — the animated navbar where the army's soldiers live.
  *
- * Idle: pets wander, bob, flip, and mutter quips.
+ * Idle: soldiers wander, bob, flip, and mutter quips.
  * On a mission: the active agent strides to a spotlight, the rest dim and
- * pause, a glowing handoff token flies between pets, and on completion the
- * whole squad hops in celebration.
+ * pause, a glowing handoff token flies between soldiers, and on completion the
+ * whole army hops in celebration.
  */
 
 import { squad, type SquadMember } from './squad';

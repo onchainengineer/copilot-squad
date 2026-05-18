@@ -1,13 +1,13 @@
 /**
- * The `@squad` GitHub Copilot chat participant.
+ * The `@army` GitHub Copilot chat participant.
  *
- * Type `@squad <task>` in Copilot Chat and the Captain routes the request to
+ * Type `@army <task>` in Copilot Chat and the Captain routes the request to
  * the right specialist, then answers *as that agent* — using the agent's
  * persona from `.github/agents/<id>.agent.md` when it exists.
  *
- *   @squad fix the navbar crash      → Captain routes to Patch 🐙
- *   @squad /roster                   → lists the whole squad
- *   @squad /recruit                  → scaffolds a new agent
+ *   @army fix the navbar crash    → Captain routes to Patch 🐙
+ *   @army /roster                 → lists the whole army
+ *   @army /recruit                → scaffolds a new agent
  */
 
 import * as vscode from 'vscode';
@@ -24,27 +24,27 @@ export function registerChatParticipant(context: vscode.ExtensionContext): void 
     return runMission(request.prompt, stream, token);
   };
 
-  const participant = vscode.chat.createChatParticipant('copilot-squad.squad', handler);
+  const participant = vscode.chat.createChatParticipant('copilot-command-centre.army', handler);
   participant.iconPath = new vscode.ThemeIcon('organization');
   context.subscriptions.push(participant);
 }
 
 function showRoster(stream: vscode.ChatResponseStream): void {
-  stream.markdown('### 🐾 The Copilot Squad\n\n');
+  stream.markdown('### 🐾 The Copilot Command Centre\n\n');
   for (const a of SQUAD) {
     stream.markdown(`**${a.emoji} ${a.name}** — *${a.role}*\n${a.blurb}\n\n`);
   }
-  stream.markdown('Hand me a task with `@squad <your task>` and I’ll route it.\n');
-  stream.button({ command: 'copilotSquad.openHQ', title: '🐾 Open Squad HQ' });
+  stream.markdown('Hand me a task with `@army <your task>` and I’ll route it.\n');
+  stream.button({ command: 'commandCentre.openHQ', title: '🐾 Open the Command Centre' });
 }
 
 function showRecruit(stream: vscode.ChatResponseStream): void {
   stream.markdown(
     '### ➕ Recruit a new agent\n\n' +
-      'A new squad member needs a name, an animal, a role, and a clear job. ' +
+      'A new soldier needs a name, an animal, a role, and a clear job. ' +
       'The recruiter will scaffold the `.agent.md` file for you.\n\n',
   );
-  stream.button({ command: 'copilotSquad.recruit', title: '➕ Recruit a New Agent' });
+  stream.button({ command: 'commandCentre.recruit', title: '➕ Recruit a New Agent' });
 }
 
 async function runMission(
@@ -54,7 +54,7 @@ async function runMission(
 ): Promise<void> {
   const task = prompt.trim();
   if (!task) {
-    stream.markdown('Hand me a mission — e.g. `@squad add a settings page` or `@squad fix the crash on load`.');
+    stream.markdown('Hand me a mission — e.g. `@army add a settings page` or `@army fix the crash on load`.');
     return;
   }
 
@@ -74,7 +74,7 @@ async function runMission(
   const persona = await readAgentPersona(agent.id);
   const messages = [
     vscode.LanguageModelChatMessage.User(
-      `You are acting as a squad agent. Adopt this persona and answer in it:\n\n` +
+      `You are acting as a soldier. Adopt this persona and answer in it:\n\n` +
         `${persona}\n\n` +
         `Stay in character as ${agent.name}. Be concise and practical. ` +
         `Open with a one-line ${agent.emoji} status, then do the work.`,
@@ -93,7 +93,7 @@ async function runMission(
 
   stream.markdown('\n\n---\n');
   stream.button({
-    command: 'copilotSquad.openAgent',
+    command: 'commandCentre.openAgent',
     title: `Open the ${agent.name} agent file`,
     arguments: [agent.id],
   });

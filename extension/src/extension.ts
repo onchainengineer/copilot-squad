@@ -1,8 +1,9 @@
 /**
- * Copilot Squad — extension entry point.
+ * Copilot Command Centre — extension entry point.
  *
- * Wires up the sidebar, the @squad chat participant, the HQ webview, the
- * status-bar mascot, the scaffold commands, and the live editor-event hooks.
+ * Wires up the sidebar, the @army chat participant, the Command Centre
+ * webview, the status-bar soldier, the scaffold commands, and the live
+ * editor-event hooks.
  */
 
 import * as vscode from 'vscode';
@@ -13,7 +14,7 @@ import { SquadStatusBar } from './statusBar';
 import { setupSquad, recruitAgent } from './scaffold';
 import { workspaceRoot } from './squadData';
 
-/** Which squad member "owns" a given file, by extension. */
+/** Which agent "owns" a given file, by extension. */
 function agentForFile(path: string): string {
   if (/\.(test|spec)\.[a-z]+$/i.test(path)) return 'hawk';
   if (/\.(md|mdx|txt|rst)$/i.test(path)) return 'quill';
@@ -34,8 +35,8 @@ export function activate(context: vscode.ExtensionContext): void {
   };
 
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('copilotSquad.roster', roster),
-    vscode.window.registerTreeDataProvider('copilotSquad.skills', skills),
+    vscode.window.registerTreeDataProvider('commandCentre.roster', roster),
+    vscode.window.registerTreeDataProvider('commandCentre.skills', skills),
   );
 
   registerChatParticipant(context);
@@ -43,35 +44,35 @@ export function activate(context: vscode.ExtensionContext): void {
   /* ── Commands ───────────────────────────────────────────── */
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('copilotSquad.openHQ', () => SquadHQPanel.show(context)),
+    vscode.commands.registerCommand('commandCentre.openHQ', () => SquadHQPanel.show(context)),
 
-    vscode.commands.registerCommand('copilotSquad.refresh', refresh),
+    vscode.commands.registerCommand('commandCentre.refresh', refresh),
 
-    vscode.commands.registerCommand('copilotSquad.setup', async () => {
+    vscode.commands.registerCommand('commandCentre.setup', async () => {
       const count = await setupSquad(context.extensionUri);
       if (count < 0) return;
       refresh();
-      SquadHQPanel.cheer('Squad deployed — six agents reporting for duty.');
+      SquadHQPanel.cheer('Army deployed — six soldiers reporting for duty.');
       const action = await vscode.window.showInformationMessage(
-        `🐾 Copilot Squad deployed — ${count} files written to .github/.`,
-        'Open Squad HQ',
-        'Ask @squad',
+        `🐾 Copilot Command Centre deployed — ${count} files written to .github/.`,
+        'Open the Command Centre',
+        'Ask @army',
       );
-      if (action === 'Open Squad HQ') vscode.commands.executeCommand('copilotSquad.openHQ');
-      if (action === 'Ask @squad') vscode.commands.executeCommand('copilotSquad.askSquad');
+      if (action === 'Open the Command Centre') vscode.commands.executeCommand('commandCentre.openHQ');
+      if (action === 'Ask @army') vscode.commands.executeCommand('commandCentre.askSquad');
     }),
 
-    vscode.commands.registerCommand('copilotSquad.recruit', async () => {
+    vscode.commands.registerCommand('commandCentre.recruit', async () => {
       const recruit = await recruitAgent();
       if (!recruit) return;
       refresh();
-      SquadHQPanel.cheer(`${recruit.emoji} ${recruit.name} joined the squad!`);
+      SquadHQPanel.cheer(`${recruit.emoji} ${recruit.name} joined the army!`);
       vscode.window.showInformationMessage(
         `${recruit.emoji} ${recruit.name} recruited — agent file created in .github/agents/.`,
       );
     }),
 
-    vscode.commands.registerCommand('copilotSquad.openAgent', async (agentId?: string) => {
+    vscode.commands.registerCommand('commandCentre.openAgent', async (agentId?: string) => {
       const root = workspaceRoot();
       if (!root || !agentId) return;
       const file = vscode.Uri.joinPath(root, '.github', 'agents', `${agentId}.agent.md`);
@@ -79,27 +80,27 @@ export function activate(context: vscode.ExtensionContext): void {
         await vscode.window.showTextDocument(file);
       } catch {
         const action = await vscode.window.showInformationMessage(
-          `No agent file for "${agentId}" yet. Deploy the squad?`,
-          'Set Up the Squad',
+          `No agent file for "${agentId}" yet. Deploy the army?`,
+          'Set Up the Army',
         );
-        if (action) vscode.commands.executeCommand('copilotSquad.setup');
+        if (action) vscode.commands.executeCommand('commandCentre.setup');
       }
     }),
 
-    vscode.commands.registerCommand('copilotSquad.askSquad', (agentId?: string) => {
+    vscode.commands.registerCommand('commandCentre.askSquad', (agentId?: string) => {
       if (typeof agentId === 'string') {
-        vscode.commands.executeCommand('copilotSquad.openAgent', agentId);
+        vscode.commands.executeCommand('commandCentre.openAgent', agentId);
         return;
       }
-      vscode.commands.executeCommand('workbench.action.chat.open', { query: '@squad ' });
+      vscode.commands.executeCommand('workbench.action.chat.open', { query: '@army ' });
     }),
 
-    vscode.commands.registerCommand('copilotSquad.runSkill', (uri?: vscode.Uri) => {
+    vscode.commands.registerCommand('commandCentre.runSkill', (uri?: vscode.Uri) => {
       if (uri) vscode.window.showTextDocument(uri);
     }),
   );
 
-  /* ── Live editor hooks — the pets react to what you do ──── */
+  /* ── Live editor hooks — the soldiers react to what you do ──── */
 
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument((doc) => {

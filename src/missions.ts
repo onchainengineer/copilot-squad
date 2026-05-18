@@ -1,7 +1,7 @@
 /**
- * THE MISSION ENGINE — the heart of Squad HQ.
+ * THE MISSION ENGINE — the heart of the Command Centre.
  *
- * You hand it a task in plain English. It plans a route across the squad,
+ * You hand it a task in plain English. It plans a route across the army,
  * then runs that route as a live relay: each agent works in turn, streams a
  * report, and hands off to the next. The Deck and the dashboard both subscribe
  * to its events and animate in response.
@@ -64,7 +64,7 @@ const s = (agentId: string, action: string) => ({ agentId, action });
 function reportFor(agentId: string, mission: string): string[] {
   const m = clip(mission.trim() || 'untitled mission');
   const lines: Record<string, string[]> = {
-    captain: [`Mission received — “${m}”.`, `Classified. Routing to the squad…`],
+    captain: [`Mission received — “${m}”.`, `Classified. Routing to the army…`],
     scout: [
       `Parsing the objective — “${m}”.`,
       `Grepped the codebase · traced symbol usages across src/.`,
@@ -163,5 +163,5 @@ export const SAMPLE_MISSIONS: Array<{ icon: string; text: string }> = [
   { icon: '🔨', text: 'Build a dark-mode toggle for the dashboard' },
   { icon: '🐛', text: 'Fix the crash when the navbar loads' },
   { icon: '🔎', text: 'Find where missions get routed to agents' },
-  { icon: '📝', text: 'Document how the mascot system works' },
+  { icon: '📝', text: 'Document how the soldier system works' },
 ];

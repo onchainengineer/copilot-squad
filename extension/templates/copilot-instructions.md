@@ -1,15 +1,15 @@
-# Copilot Squad — Repository Instructions
+# Copilot Command Centre — Repository Instructions
 
 These instructions load into **every** GitHub Copilot Chat request in this repo.
-They are the squad's shared brain. Keep them short, true, and high-signal.
+They are the army's shared brain. Keep them short, true, and high-signal.
 
-## How the squad works
+## How the army works
 
-This repo is staffed by a **Copilot Squad** — a set of custom agents in
+This repo is staffed by a **Copilot Command Centre** — an army of custom agents in
 `.github/agents/`, each with a narrow job and a restricted tool set:
 
-| Agent | Use them for… |
-|-------|---------------|
+| Soldier | Use them for… |
+|---------|---------------|
 | 🦊 **Scout** | finding, locating, understanding, researching the codebase |
 | 🦫 **Hammer** | building features, implementing, scaffolding |
 | 🦅 **Hawk** | reviewing code, catching bugs and risky changes |
@@ -18,10 +18,10 @@ This repo is staffed by a **Copilot Squad** — a set of custom agents in
 | 🦉 **Quill** | writing docs, comments, and READMEs |
 
 Reusable multi-step jobs live as **skills** in `.github/prompts/`, runnable as
-`/slash` commands. In Copilot Chat you can also type `@squad <task>` to have the
+`/slash` commands. In Copilot Chat you can also type `@army <task>` to have the
 Captain route the work automatically.
 
-When you act as a squad agent: stay strictly in your lane, do your one job well,
+When you act as a soldier: stay strictly in your lane, do your one job well,
 and hand off explicitly when the work belongs to a teammate.
 
 ## Working agreement

@@ -1,17 +1,17 @@
 ---
-name: squad-standup
+name: army-standup
 description: The Captain runs a daily-standup style report on the state of the repo
 agent: Captain
 tools: ['codebase', 'search', 'changes']
 ---
 
-# Skill — Squad Standup
+# Skill — Army Standup
 
-Run a fun, fast "standup" for the squad. The Captain chairs it.
+Run a fast, focused "standup" for the army. The Captain chairs it.
 
 1. Use `changes` to see what's been touched recently, and skim the repo state.
-2. For **each** squad member in `.github/agents/`, write a one-line standup update
-   *in that member's voice*, covering work in their lane:
+2. For **each** soldier in `.github/agents/`, write a one-line standup update
+   *in that soldier's voice*, covering work in their lane:
    - **Scout** 🦊 — anything worth exploring or unclear in the codebase?
    - **Hammer** 🦫 — what's built / what's ready to build?
    - **Hawk** 🦅 — any review concerns in the current changes?
@@ -22,7 +22,7 @@ Run a fun, fast "standup" for the squad. The Captain chairs it.
 
 Keep it punchy — this is a standup, not a status report. Format as:
 
-> **🐕 Squad Standup — <date>**
+> **🐕 Army Standup — <date>**
 >
 > 🦊 **Scout:** …
 > 🦫 **Hammer:** …

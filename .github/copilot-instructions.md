@@ -1,13 +1,12 @@
-# Copilot Squad — Repository Instructions
+# Copilot Command Centre — Repository Instructions
 
 These instructions are loaded automatically into **every** Copilot Chat request in
 this repo. Keep them short, true, and high-signal — this is the squad's shared brain.
 
 ## What this project is
 
-**Squad HQ** is a small Vite + TypeScript single-page app. It visualizes a squad of
-AI agents as animated mascot "pets" that wander a navbar. It is the playground for the
-*Copilot Squad* workshop — the app is where the agents do their work.
+TODO: Describe Command Centre in 2–3 sentences — what the app is, and that it is the
+playground for the Copilot Command Centre workshop.
 
 ## Tech stack
 
@@ -18,16 +17,8 @@ AI agents as animated mascot "pets" that wander a navbar. It is the playground f
 
 ## Project map
 
-| Path | What it is |
-|------|-----------|
-| `src/squad.ts` | The roster — single source of truth for squad members. |
-| `src/mascots.ts` | One SVG builder per animal. |
-| `src/missions.ts` | The mission engine — plans a route and runs it as a live relay. |
-| `src/navbar.ts` | The animated "Deck" — mascots wander, spotlight, hand off. |
-| `src/dashboard.ts` | HQ panels: HUD, mission control, roster. |
-| `src/main.ts` | Entry point — wires every panel to the shared MissionEngine. |
-| `.github/agents/` | The squad's Copilot agents (one `.agent.md` per member). |
-| `.github/prompts/` | Reusable skills, runnable as `/slash` commands. |
+TODO: A short table of what each file under `src/` does — `squad.ts`,
+`mascots.ts`, `missions.ts`, `navbar.ts`, `dashboard.ts`, `main.ts`.
 
 ## Code conventions
 
@@ -39,12 +30,7 @@ AI agents as animated mascot "pets" that wander a navbar. It is the playground f
   `mascots.ts` **and** create `.github/agents/<id>.agent.md`. All three, or none.
 - Never break the build. `npm run build` must stay green.
 
-## How the squad works
+## How the army works
 
-Each squad member is a **custom agent** in `.github/agents/`. Each agent has a
-narrow job, a restricted tool set, and a personality. The **Captain** agent routes
-work to the right teammate. Reusable multi-step jobs live as **skills** (prompt
-files) in `.github/prompts/`.
-
-When you act as a squad agent: stay in your lane, do your one job well, and hand off
-explicitly when the work belongs to a teammate.
+TODO: Explain that each soldier is a custom agent in `.github/agents/`,
+reusable skills live in `.github/prompts/`, and each agent stays in its lane.

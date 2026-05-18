@@ -1,5 +1,5 @@
-/* Squad HQ — webview controller. Plain JS, no modules (webview context).
- * Mascot art + frame generation lives in sprites.js (window.Squad). */
+/* Command Centre — webview controller. Plain JS, no modules (webview context).
+ * Soldier art + frame generation lives in sprites.js (window.Squad). */
 (function () {
   'use strict';
   var vscode = acquireVsCodeApi();
@@ -21,27 +21,32 @@
     '<div class="topbar">' +
     '  <div class="brand">' +
     '    <div class="brand-mark">🐾</div>' +
-    '    <div class="brand-text"><h1>Copilot Squad</h1><p>Command Center</p></div>' +
+    '    <div class="brand-text">' +
+    '      <p class="eyebrow">GitHub Copilot</p>' +
+    '      <h1>Copilot Command Centre</h1>' +
+    '    </div>' +
     '  </div>' +
     '  <div class="status-chip"><span class="dot"></span>' + SQUAD.length + ' agents · operational</div>' +
     '</div>' +
     '<div class="deck" id="deck"><span class="deck-label">The Deck</span></div>' +
     '<div>' +
-    '  <div class="section-head"><span class="tick"></span><h2>Squad Roster</h2>' +
+    '  <div class="section-head"><span class="tick"></span>' +
+    '    <span class="eyebrow">Roster</span><h2>Army Roster</h2>' +
     '    <span class="count">' + SQUAD.length + ' agents</span></div>' +
     '  <div class="grid" id="grid"></div>' +
     '</div>' +
     '<div>' +
-    '  <div class="section-head"><span class="tick"></span><h2>Live Activity</h2>' +
+    '  <div class="section-head"><span class="tick"></span>' +
+    '    <span class="eyebrow">Telemetry</span><h2>Live Activity</h2>' +
     '    <span class="count" id="ev-count">0 events</span></div>' +
     '  <div class="panel"><div class="stream" id="stream"></div></div>' +
     '</div>' +
     '<div class="actions">' +
-    '  <button class="action primary" data-cmd="copilotSquad.askSquad">💬 Ask the Squad</button>' +
-    '  <button class="action" data-cmd="copilotSquad.recruit">➕ Recruit an Agent</button>' +
-    '  <button class="action" data-cmd="copilotSquad.setup">🚀 Set Up the Squad</button>' +
+    '  <button class="action primary" data-cmd="commandCentre.askSquad">💬 Ask the Centre</button>' +
+    '  <button class="action" data-cmd="commandCentre.recruit">➕ Recruit an Agent</button>' +
+    '  <button class="action" data-cmd="commandCentre.setup">🚀 Set Up the Army</button>' +
     '</div>' +
-    '<div class="foot">Each mascot is a real Copilot agent · click one to put it to work</div>';
+    '<div class="foot">Each soldier is a real Copilot agent · click one to put it to work</div>';
 
   /* ── Agent cards ────────────────────────────────────────── */
   var grid = document.getElementById('grid');
@@ -62,7 +67,7 @@
     grid.appendChild(card);
   });
 
-  /* ── Roaming sprite pets ────────────────────────────────── */
+  /* ── Roaming soldiers ───────────────────────────────────── */
   var deck = document.getElementById('deck');
   var pets = SQUAD.map(function (agent, i) {
     var el = document.createElement('button');
@@ -167,7 +172,7 @@
     var time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     row.innerHTML =
       '<span class="ev-emoji">' + (agent ? agent.emoji : '🐾') + '</span>' +
-      '<span class="ev-agent">' + (agent ? agent.name : 'Squad') + '</span>' +
+      '<span class="ev-agent">' + (agent ? agent.name : 'Army') + '</span>' +
       '<span class="ev-text">' + text + '</span>' +
       '<span class="ev-time">' + time + '</span>';
     stream.insertBefore(row, stream.firstChild);
@@ -215,7 +220,7 @@
           setSprite(pet, 'walk');
         }, 1900);
       });
-      addEvent(null, msg.text || 'Squad assembled.');
+      addEvent(null, msg.text || 'Army assembled.');
     }
   });
 

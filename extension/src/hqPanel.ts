@@ -1,7 +1,7 @@
 /**
- * Squad HQ — the animated webview panel.
+ * Command Centre — the animated webview panel.
  *
- * A command-center view where the mascot agents roam, react to live editor
+ * A command-centre view where the soldiers roam, react to live editor
  * activity, and can be put to work with a click. The extension drives it with
  * `pulse()` / `cheer()`; the webview talks back via `postMessage`.
  */
@@ -28,8 +28,8 @@ export class SquadHQPanel {
       return;
     }
     const panel = vscode.window.createWebviewPanel(
-      'copilotSquad.hq',
-      'Squad HQ',
+      'commandCentre.hq',
+      'Command Centre',
       vscode.ViewColumn.Active,
       {
         enableScripts: true,
@@ -45,7 +45,7 @@ export class SquadHQPanel {
     SquadHQPanel.current?.post({ type: 'pulse', agentId, text });
   }
 
-  /** Make the whole squad celebrate (e.g. a new agent was recruited). */
+  /** Make the whole army celebrate (e.g. a new agent was recruited). */
   static cheer(text: string): void {
     SquadHQPanel.current?.post({ type: 'cheer', text });
   }
@@ -57,7 +57,7 @@ export class SquadHQPanel {
     this.panel.webview.onDidReceiveMessage(
       (msg) => {
         if (msg?.type === 'select' && typeof msg.agentId === 'string') {
-          vscode.commands.executeCommand('copilotSquad.askSquad', msg.agentId);
+          vscode.commands.executeCommand('commandCentre.askSquad', msg.agentId);
         } else if (msg?.type === 'run' && typeof msg.command === 'string') {
           vscode.commands.executeCommand(msg.command);
         }
@@ -91,7 +91,7 @@ export class SquadHQPanel {
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${n}';" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="${asset('hq.css')}" />
-<title>Squad HQ</title>
+<title>Command Centre</title>
 </head>
 <body>
 <div id="app"></div>

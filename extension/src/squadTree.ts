@@ -1,12 +1,12 @@
 /**
- * The Activity Bar sidebar: a "Squad" tree of agents and a "Skills" tree of
+ * The Activity Bar sidebar: an "Army" tree of agents and a "Skills" tree of
  * prompt files. Both read the workspace `.github/` folder and refresh on demand.
  */
 
 import * as vscode from 'vscode';
 import { SQUAD, findAgentFiles, findSkillFiles } from './squadData';
 
-/* ── Squad roster tree ────────────────────────────────────── */
+/* ── Army roster tree ─────────────────────────────────────── */
 
 class AgentItem extends vscode.TreeItem {
   constructor(
@@ -30,7 +30,7 @@ class AgentItem extends vscode.TreeItem {
       };
       this.resourceUri = fileUri;
     } else {
-      this.command = { command: 'copilotSquad.setup', title: 'Set up the squad' };
+      this.command = { command: 'commandCentre.setup', title: 'Set up the army' };
     }
   }
 }
@@ -101,7 +101,7 @@ export class SkillTreeProvider implements vscode.TreeDataProvider<vscode.TreeIte
 
   async getChildren(): Promise<vscode.TreeItem[]> {
     const files = await findSkillFiles();
-    if (files.length === 0) return [new EmptyItem('No skills yet — set up the squad')];
+    if (files.length === 0) return [new EmptyItem('No skills yet — set up the army')];
     return files.map((uri) => {
       const name = uri.path.split('/').pop()!.replace('.prompt.md', '');
       return new SkillItem(name, uri);

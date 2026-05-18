@@ -1,12 +1,12 @@
 /**
- * THE SQUAD ROSTER — single source of truth.
+ * THE ARMY ROSTER — single source of truth.
  *
- * Every entry here becomes a mascot wandering the navbar AND a card in HQ.
- * Each squad member also has a matching Copilot agent file in
- * `.github/agents/<id>.agent.md`. The pet IS the agent.
+ * Every entry here becomes a soldier wandering the navbar AND a card in HQ.
+ * Each soldier also has a matching Copilot agent file in
+ * `.github/agents/<id>.agent.md`. The soldier IS the agent.
  *
- * Want a new teammate? You *could* hand-edit this file... or you could let
- * the squad do it for you. Run the `/recruit-squad-member` skill. (See LAB 3.)
+ * Want a new soldier? You *could* hand-edit this file... or you could let
+ * the army do it for you. Run the `/recruit-soldier` skill. (See LAB 3.)
  */
 
 export interface SquadMember {
@@ -16,15 +16,15 @@ export interface SquadMember {
   name: string;
   /** one-line job title */
   role: string;
-  /** the animal — drives which mascot SVG is drawn */
+  /** the animal — drives which soldier SVG is drawn */
   animal: 'fox' | 'beaver' | 'hawk' | 'octopus' | 'owl' | 'corgi';
   /** accent color, hex */
   color: string;
   /** what this agent is brilliant at */
   specialty: string;
-  /** said when you hover the mascot */
+  /** said when you hover the soldier */
   catchphrase: string;
-  /** random chatter the mascot mutters while wandering */
+  /** random chatter the soldier mutters while wandering */
   quips: string[];
 }
 
@@ -76,19 +76,11 @@ export const squad: SquadMember[] = [
     animal: 'corgi',
     color: '#10b981',
     specialty: 'Reads the mission, picks the right teammate, hands off the work. The glue.',
-    catchphrase: 'Squad — assemble.',
+    catchphrase: 'Army — assemble.',
     quips: ['who has the ball?', 'good call, team', 'routing this one', 'standup in 5'],
   },
-  {
-    id: 'quill',
-    name: 'Quill',
-    role: 'Scribe Agent',
-    animal: 'owl',
-    color: '#14b8a6',
-    specialty: 'Writes the docs, the comments, the READMEs. Makes the codebase make sense.',
-    catchphrase: 'If it isn’t written down, it didn’t happen.',
-    quips: ['drafting...', 'this needs a docstring', 'hoot — clarified', 'words words words'],
-  },
+  // The army is missing its sixth soldier — a Scribe.
+  // You'll recruit Quill the owl in LAB 4 using the /recruit-soldier skill.
 ];
 
 export const getMember = (id: string): SquadMember | undefined =>

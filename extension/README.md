@@ -1,50 +1,50 @@
-# 🐾 Copilot Squad — VS Code Extension
+# 🐾 Copilot Command Centre — VS Code Extension
 
-> Your own squad of GitHub Copilot agents — animated mascot companions, a routing
-> `@squad` chat participant, and one-click agent scaffolding.
+> A command centre for your GitHub Copilot agents — animated soldier companions, a
+> routing `@army` chat participant, and one-click agent scaffolding.
 
-Copilot Squad turns custom GitHub Copilot agents into a **team you can see and
-command**. Six mascot agents roam an animated command center, react to what you do
-in the editor, and get put to work straight from VS Code.
+Copilot Command Centre turns custom GitHub Copilot agents into an **army you can see
+and command**. Six soldiers roam an animated command centre, react to what you
+do in the editor, and get put to work straight from VS Code.
 
-This is the companion extension for the **Copilot Squad workshop** — install it
-and you walk in with a working squad already at your side.
+This is the companion extension for the **Copilot Command Centre workshop** —
+install it and you walk in with a working army already at your side.
 
 ---
 
 ## What it gives you
 
-### 🟦 The `@squad` chat participant
-Type `@squad <task>` in Copilot Chat. The **Captain** reads the mission, routes it
+### 🟦 The `@army` chat participant
+Type `@army <task>` in Copilot Chat. The **Captain** reads the mission, routes it
 to the right specialist, and answers in that agent's voice — using the persona
 from `.github/agents/`.
 
 ```
-@squad fix the navbar crash      →  🐕 Captain routes to Patch 🐙
-@squad /roster                   →  the full squad
-@squad /recruit                  →  scaffold a new agent
+@army fix the navbar crash    →  🐕 Captain routes to Patch 🐙
+@army /roster                 →  the full army
+@army /recruit                →  scaffold a new agent
 ```
 
-### 🐾 Squad HQ — the command center
-An animated webview where the mascots roam, react to your **live editor activity**
+### 🐾 The Command Centre
+An animated webview where the soldiers roam, react to your **live editor activity**
 (save a file, watch the right agent light up), and can be put to work with a click.
 
-### 🧭 The Squad sidebar
+### 🧭 The Army sidebar
 An Activity Bar view listing every agent and skill discovered in `.github/`.
 Click an agent to open its brain; click a skill to run it.
 
 ### 🚀 One-click scaffolding
-- **Set Up the Squad** — deploys six ready-made agents, skills, and a shared
+- **Set Up the Army** — deploys six ready-made agents, skills, and a shared
   charter into your workspace `.github/` folder.
 - **Recruit a New Agent** — interactively scaffolds a brand-new `.agent.md`,
   tuned to your project.
 
-### 🦊 A status-bar mascot
-A small live presence that cycles the squad and flashes the agent at work.
+### 🦊 A status-bar soldier
+A small live presence that cycles the army and flashes the agent at work.
 
 ---
 
-## The squad
+## The army
 
 | Agent | Role | Specialty |
 |-------|------|-----------|
@@ -62,7 +62,7 @@ A small live presence that cycles the squad and flashes the agent at work.
 - VS Code **1.96+**
 - The **GitHub Copilot** + **Copilot Chat** extensions, signed in
 
-The `@squad` participant uses the VS Code Language Model API with your Copilot
+The `@army` participant uses the VS Code Language Model API with your Copilot
 subscription. No other services, no MCP, no cloud agents.
 
 ---
@@ -76,8 +76,8 @@ npm run compile
 ```
 
 Then press **F5** in VS Code to launch the Extension Development Host. Open the
-🐾 **Copilot Squad** icon in the Activity Bar, or run **Copilot Squad: Open Squad
-HQ** from the Command Palette.
+🐾 **Copilot Command Centre** icon in the Activity Bar, or run **Copilot Command
+Centre: Open the Command Centre** from the Command Palette.
 
 To package a shareable `.vsix`:
 
@@ -91,12 +91,12 @@ npx @vscode/vsce package
 
 | Command | What it does |
 |---------|--------------|
-| `Copilot Squad: Open Squad HQ` | Opens the animated command center |
-| `Copilot Squad: Set Up the Squad` | Deploys the squad into `.github/` |
-| `Copilot Squad: Recruit a New Agent` | Scaffolds a new `.agent.md` |
-| `Copilot Squad: Ask the Squad` | Opens Copilot Chat with `@squad` |
+| `Copilot Command Centre: Open the Command Centre` | Opens the animated command centre |
+| `Copilot Command Centre: Set Up the Army in This Workspace` | Deploys the army into `.github/` |
+| `Copilot Command Centre: Recruit a New Agent` | Scaffolds a new `.agent.md` |
+| `Copilot Command Centre: Ask the Centre` | Opens Copilot Chat with `@army` |
 
 ---
 
-Built for the **Copilot Squad** workshop. The pets are your agents — go give them
-work to do.
+Built for the **Copilot Command Centre** workshop. The soldiers are your agents — go
+give them work to do.

@@ -1,11 +1,11 @@
 /**
- * MASCOT ART — one cute SVG per animal.
+ * SOLDIER ART — one SVG per animal.
  *
- * All mascots share a "blob pet" base so the squad looks like a set.
- * Each function takes the squad member's accent color and returns SVG markup.
+ * All soldiers share a "blob" base so the army looks like a set.
+ * Each function takes the soldier's accent color and returns SVG markup.
  *
  * Adding a new animal? Add a case here + a builder function, and add the
- * animal to the union type in `squad.ts`. The `/recruit-squad-member` skill
+ * animal to the union type in `squad.ts`. The `/recruit-soldier` skill
  * knows how to do this for you.
  */
 
@@ -103,7 +103,7 @@ const BUILDERS: Record<SquadMember['animal'], (c: string) => string> = {
   corgi,
 };
 
-/** Returns a full <svg> string for a squad member's mascot. */
+/** Returns a full <svg> string for a soldier's art. */
 export function mascotSvg(member: SquadMember): string {
   const build = BUILDERS[member.animal];
   const inner = build

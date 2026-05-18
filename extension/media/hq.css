@@ -1,19 +1,28 @@
 /* ═══════════════════════════════════════════════════════════
-   Squad HQ — enterprise command-center theme (webview)
+   Copilot Command Centre — GitHub-native command-centre theme
+   Flat, crisp, dark, mono-forward, green accent. No blur, no glow.
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --bg-0: #080a12;
-  --bg-1: #0e1320;
-  --surface: rgba(20, 27, 44, 0.72);
-  --surface-2: rgba(12, 17, 30, 0.66);
-  --line: rgba(120, 140, 190, 0.14);
-  --line-strong: rgba(120, 140, 190, 0.28);
-  --ink: #eef2ff;
-  --ink-dim: #97a2c2;
-  --ink-faint: #5d6688;
-  --brand: #6b8cff;
-  --ok: #43d99a;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --panel2: #1c2128;
+  --line: #30363d;
+  --fg: #e6edf3;
+  --muted: #8b949e;
+  --dim: #6e7681;
+
+  --green: #3fb950;
+  --blue: #58a6ff;
+  --purple: #bc8cff;
+  --orange: #ffa657;
+  --red: #f85149;
+  --yellow: #e3b341;
+
+  --inset: #010409;
+
+  --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Arial, sans-serif;
 }
 
 * {
@@ -28,12 +37,9 @@ body {
 }
 
 body {
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: var(--ink);
-  background:
-    radial-gradient(900px 480px at 88% -6%, rgba(70, 96, 190, 0.26), transparent 62%),
-    radial-gradient(700px 420px at 4% 8%, rgba(120, 70, 170, 0.16), transparent 58%),
-    linear-gradient(180deg, var(--bg-1), var(--bg-0));
+  font-family: var(--sans);
+  color: var(--fg);
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   font-size: 13px;
 }
@@ -41,16 +47,50 @@ body {
 #app {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 22px 22px 40px;
+  padding: 24px 24px 44px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
+}
+
+/* ── Type system ──────────────────────────────────────────── */
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 600;
+}
+
+.label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
 
 code {
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  font-size: 0.88em;
-  color: #9fb6ff;
+  font-family: var(--mono);
+  font-size: 0.86em;
+  color: var(--blue);
+  background: var(--inset);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+pre {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg);
+  background: var(--inset);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
 }
 
 /* ── Top bar ──────────────────────────────────────────────── */
@@ -61,51 +101,51 @@ code {
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
 }
 
 .brand-mark {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
   font-size: 20px;
-  border-radius: 11px;
-  background: linear-gradient(150deg, rgba(107, 140, 255, 0.32), rgba(107, 140, 255, 0.08));
-  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+}
+
+.brand-text .eyebrow {
+  display: block;
+  margin-bottom: 4px;
 }
 
 .brand-text h1 {
-  font-size: 16px;
-  font-weight: 760;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.brand-text p {
-  font-size: 10.5px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-top: 2px;
+  font-family: var(--sans);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
 }
 
 .status-chip {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 13px;
+  padding: 6px 12px;
+  font-family: var(--mono);
   font-size: 11px;
-  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-dim);
-  background: var(--surface-2);
+  color: var(--muted);
+  background: var(--inset);
   border: 1px solid var(--line);
   border-radius: 999px;
 }
@@ -114,23 +154,24 @@ code {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--ok);
-  box-shadow: 0 0 9px var(--ok);
+  background: var(--green);
   animation: breathe 2.6s ease-in-out infinite;
 }
 
-/* ── The Deck (roaming mascots) ───────────────────────────── */
+/* ── The Deck (roaming soldiers) ──────────────────────────── */
 
 .deck {
   position: relative;
-  height: 132px;
-  border-radius: 16px;
+  height: 134px;
+  border-radius: 12px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(16, 22, 38, 0.9), rgba(10, 14, 24, 0.78)),
-    repeating-linear-gradient(90deg, transparent 0 39px, rgba(120, 140, 190, 0.05) 39px 40px);
+  background: var(--panel2);
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 39px,
+    rgba(110, 118, 129, 0.07) 39px 40px
+  );
   border: 1px solid var(--line);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .deck::after {
@@ -140,18 +181,18 @@ code {
   right: 0;
   bottom: 12px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(140, 165, 230, 0.32), transparent);
+  background: var(--line);
 }
 
 .deck-label {
   position: absolute;
-  top: 11px;
+  top: 12px;
   left: 14px;
-  font-size: 9.5px;
-  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--dim);
 }
 
 .pet {
@@ -173,20 +214,22 @@ code {
   position: absolute;
   left: 50%;
   bottom: 6px;
-  width: 116px;
-  height: 116px;
+  width: 96px;
+  height: 96px;
   transform: translateX(-50%);
-  background: radial-gradient(circle, var(--accent), transparent 62%);
+  background: radial-gradient(circle, var(--accent), transparent 64%);
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
 }
 
 .pet.busy::before {
-  opacity: 0.4;
+  opacity: 0.22;
 }
 
-/* sprite — 8 frames in a strip, flipped by a compositor-driven steps() loop */
+/* sprite — 8 frames in a strip, flipped by a compositor-driven steps() loop.
+   display:block is REQUIRED: .sprite is a <span>, and inline elements ignore
+   overflow:hidden — without it all 8 frames show at once. */
 .sprite {
   display: block;
   width: 64px;
@@ -212,13 +255,13 @@ code {
   display: block;
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 3px 4px rgba(1, 4, 9, 0.7));
   transition: filter 0.25s ease;
 }
 
 .pet:hover .frame svg,
 .pet.busy .frame svg {
-  filter: drop-shadow(0 0 12px var(--accent)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 0 6px var(--accent)) drop-shadow(0 3px 4px rgba(1, 4, 9, 0.7));
 }
 
 @keyframes sprite-step {
@@ -230,12 +273,12 @@ code {
 .pet-name {
   display: block;
   text-align: center;
-  margin-top: 3px;
+  margin-top: 4px;
+  font-family: var(--mono);
   font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--dim);
 }
 
 .pet:hover .pet-name,
@@ -253,11 +296,12 @@ code {
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 5px 10px;
+  font-family: var(--mono);
   font-size: 11px;
-  font-weight: 600;
-  color: #0b1020;
-  background: #fff;
-  border-radius: 9px;
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 7px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.16s ease, transform 0.16s ease;
@@ -266,12 +310,14 @@ code {
 .pet-bubble::after {
   content: '';
   position: absolute;
-  bottom: -4px;
+  bottom: -5px;
   left: 50%;
   transform: translateX(-50%) rotate(45deg);
-  width: 9px;
-  height: 9px;
-  background: #fff;
+  width: 8px;
+  height: 8px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .pet-bubble.show {
@@ -284,67 +330,82 @@ code {
 .section-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 11px;
+  gap: 9px;
+  margin-bottom: 13px;
 }
 
 .section-head h2 {
+  font-family: var(--mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: var(--fg);
+}
+
+.section-head .eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
 }
 
 .section-head .tick {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--brand);
-  box-shadow: 0 0 8px var(--brand);
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--green);
 }
 
 .section-head .count {
   margin-left: auto;
-  font-size: 10.5px;
-  color: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 10px;
   letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
 
 /* ── Agent grid ───────────────────────────────────────────── */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
-  gap: 11px;
+  grid-template-columns: repeat(auto-fill, minmax(262px, 1fr));
+  gap: 12px;
 }
 
 .agent {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 13px;
-  border-radius: 13px;
-  background: var(--surface);
+  gap: 13px;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--panel);
   border: 1px solid var(--line);
   cursor: pointer;
   overflow: hidden;
-  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  transition: border-color 0.16s ease, background 0.16s ease;
 }
 
 .agent:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
-  box-shadow: 0 12px 30px -16px var(--accent);
+  border-color: var(--blue);
+  background: var(--panel2);
 }
 
 .agent::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: radial-gradient(110px 70px at 12% 0%, var(--accent), transparent 72%);
-  opacity: 0.14;
-  pointer-events: none;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.16s ease;
+}
+
+.agent:hover::before,
+.agent.busy::before {
+  opacity: 1;
 }
 
 .agent-svg {
@@ -356,7 +417,7 @@ code {
 .agent-svg svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 4px rgba(1, 4, 9, 0.6));
 }
 
 .agent-info {
@@ -365,55 +426,92 @@ code {
 }
 
 .agent-info h3 {
-  font-size: 13.5px;
-  font-weight: 720;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  color: #fff;
 }
 
 .agent-info .role {
+  font-family: var(--mono);
   font-size: 9.5px;
-  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 .agent-info .blurb {
-  font-size: 11px;
-  color: var(--ink-dim);
-  margin-top: 5px;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 6px;
   line-height: 1.45;
 }
 
 .agent-state {
   position: absolute;
-  top: 11px;
-  right: 12px;
+  top: 12px;
+  right: 13px;
+  font-family: var(--mono);
   font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 999px;
-  color: var(--ink-faint);
-  background: rgba(255, 255, 255, 0.05);
-  transition: all 0.25s ease;
+  color: var(--dim);
+  background: var(--inset);
+  border: 1px solid var(--line);
+  transition: all 0.2s ease;
 }
 
 .agent.busy .agent-state {
-  color: #0b1020;
-  background: var(--accent);
-  box-shadow: 0 0 14px -2px var(--accent);
+  color: var(--green);
+  border-color: var(--green);
+  background: rgba(63, 185, 80, 0.12);
+}
+
+/* ── Panels ───────────────────────────────────────────────── */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.panel.dark {
+  background: var(--panel2);
+}
+
+/* ── Callout ──────────────────────────────────────────────── */
+
+.callout {
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green);
+  background: linear-gradient(90deg, rgba(63, 185, 80, 0.08), transparent 70%);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.callout.blue {
+  border-left-color: var(--blue);
+  background: linear-gradient(90deg, rgba(88, 166, 255, 0.08), transparent 70%);
+}
+
+.callout.purple {
+  border-left-color: var(--purple);
+  background: linear-gradient(90deg, rgba(188, 140, 255, 0.08), transparent 70%);
+}
+
+.callout.red {
+  border-left-color: var(--red);
+  background: linear-gradient(90deg, rgba(248, 81, 73, 0.08), transparent 70%);
 }
 
 /* ── Activity stream ──────────────────────────────────────── */
-
-.panel {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 16px 18px;
-}
 
 .stream {
   display: flex;
@@ -424,25 +522,25 @@ code {
 }
 
 .stream:empty::before {
-  content: 'Standing by — squad activity will appear here as you work.';
-  color: var(--ink-faint);
-  font-size: 11.5px;
-  font-style: italic;
+  content: 'Standing by — command centre activity will appear here as you work.';
+  color: var(--dim);
+  font-family: var(--mono);
+  font-size: 11px;
 }
 
 .event {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 7px 9px;
-  border-radius: 8px;
+  gap: 10px;
+  padding: 8px 9px;
+  border-radius: 7px;
   font-size: 12px;
   border-left: 2px solid var(--accent);
   animation: slidein 0.3s ease;
 }
 
 .event:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.022);
+  background: rgba(110, 118, 129, 0.06);
 }
 
 .event .ev-emoji {
@@ -450,19 +548,22 @@ code {
 }
 
 .event .ev-agent {
-  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
   color: var(--accent);
-  min-width: 52px;
+  min-width: 56px;
 }
 
 .event .ev-text {
-  color: var(--ink-dim);
+  color: var(--muted);
 }
 
 .event .ev-time {
   margin-left: auto;
+  font-family: var(--mono);
   font-size: 10px;
-  color: var(--ink-faint);
+  color: var(--dim);
   font-variant-numeric: tabular-nums;
 }
 
@@ -470,53 +571,55 @@ code {
 
 .actions {
   display: flex;
-  gap: 9px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .action {
   flex: 1;
-  min-width: 150px;
+  min-width: 152px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 12px 14px;
+  font-family: var(--mono);
   font-size: 12px;
-  font-weight: 650;
-  color: var(--ink);
-  background: var(--surface-2);
+  font-weight: 500;
+  color: var(--fg);
+  background: var(--inset);
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.16s ease, background 0.16s ease, transform 0.08s ease;
+  transition: border-color 0.16s ease, background 0.16s ease;
 }
 
 .action:hover {
-  border-color: var(--brand);
-  background: rgba(107, 140, 255, 0.12);
+  border-color: var(--blue);
 }
 
 .action:active {
-  transform: scale(0.98);
+  background: var(--panel2);
 }
 
 .action.primary {
-  color: #fff;
-  background: linear-gradient(180deg, #5b82ff, #3a5ad8);
-  border-color: transparent;
+  color: var(--inset);
+  background: var(--green);
+  border-color: var(--green);
+  font-weight: 600;
 }
 
 .action.primary:hover {
-  filter: brightness(1.1);
-  background: linear-gradient(180deg, #5b82ff, #3a5ad8);
+  border-color: var(--green);
+  filter: brightness(1.08);
 }
 
 .foot {
   text-align: center;
-  font-size: 10.5px;
-  color: var(--ink-faint);
-  letter-spacing: 0.04em;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--dim);
 }
 
 /* ── Animations ───────────────────────────────────────────── */
@@ -530,6 +633,6 @@ code {
 
 @keyframes breathe {
   50% {
-    opacity: 0.4;
+    opacity: 0.35;
   }
 }
