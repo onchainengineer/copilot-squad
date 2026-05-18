@@ -180,3 +180,66 @@ export async function readAgentPersona(id: string): Promise<string> {
     `request belongs to a different specialist, say so and name the teammate.`,
   ].join('\n');
 }
+
+/* ── Agent metadata + skills (parsed from `.github/` files) ── */
+
+/** Returns the YAML frontmatter block of a markdown string (without fences). */
+function frontmatter(md: string): string {
+  if (!md.startsWith('---')) return '';
+  const end = md.indexOf('\n---', 3);
+  return end === -1 ? '' : md.slice(3, end);
+}
+
+async function readText(uri: vscode.Uri): Promise<string> {
+  try {
+    return Buffer.from(await vscode.workspace.fs.readFile(uri)).toString('utf8');
+  } catch {
+    return '';
+  }
+}
+
+export interface AgentMeta {
+  tools: string[];
+  handoffs: string[];
+}
+
+/** Tools + handoff targets declared in an agent's `.agent.md` frontmatter. */
+export async function readAgentMeta(id: string): Promise<AgentMeta> {
+  const root = workspaceRoot();
+  if (!root) return { tools: [], handoffs: [] };
+  const fm = frontmatter(
+    await readText(vscode.Uri.joinPath(root, '.github/agents', `${id}.agent.md`)),
+  );
+  const toolsMatch = fm.match(/^tools:\s*\[([^\]]*)\]/m);
+  const tools = toolsMatch
+    ? toolsMatch[1]
+        .split(',')
+        .map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
+        .filter(Boolean)
+    : [];
+  const handoffs = [...fm.matchAll(/^\s+agent:\s*['"]?([A-Za-z][\w-]*)['"]?/gm)].map((m) => m[1]);
+  return { tools, handoffs: [...new Set(handoffs)] };
+}
+
+export interface SkillRef {
+  name: string;
+  agent: string;
+  uri: vscode.Uri;
+}
+
+/** Every prompt-file skill, with the agent each one targets (`agent:` frontmatter). */
+export async function readSkills(): Promise<SkillRef[]> {
+  const files = await findSkillFiles();
+  const out: SkillRef[] = [];
+  for (const uri of files) {
+    const fm = frontmatter(await readText(uri));
+    const nameMatch = fm.match(/^name:\s*(\S+)/m);
+    const agentMatch = fm.match(/^agent:\s*['"]?([A-Za-z][\w-]*)['"]?/m);
+    out.push({
+      name: nameMatch ? nameMatch[1] : uri.path.split('/').pop()!.replace('.prompt.md', ''),
+      agent: agentMatch ? agentMatch[1] : 'agent',
+      uri,
+    });
+  }
+  return out;
+}

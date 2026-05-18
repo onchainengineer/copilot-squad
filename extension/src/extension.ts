@@ -65,19 +65,27 @@ export function activate(context: vscode.ExtensionContext): void {
       );
     }),
 
-    vscode.commands.registerCommand('commandCentre.openAgent', async (agentId?: string) => {
-      const root = workspaceRoot();
-      if (!root || !agentId) return;
-      const file = vscode.Uri.joinPath(root, '.github', 'agents', `${agentId}.agent.md`);
-      try {
-        await vscode.window.showTextDocument(file);
-      } catch {
-        const action = await vscode.window.showInformationMessage(
-          `No agent file for "${agentId}" yet. Deploy the army?`,
-          'Set Up the Army',
-        );
-        if (action) vscode.commands.executeCommand('commandCentre.setup');
-      }
+    vscode.commands.registerCommand(
+      'commandCentre.openAgent',
+      async (arg?: { agentId?: string } | string) => {
+        const agentId = typeof arg === 'string' ? arg : arg?.agentId;
+        const root = workspaceRoot();
+        if (!root || !agentId) return;
+        const file = vscode.Uri.joinPath(root, '.github', 'agents', `${agentId}.agent.md`);
+        try {
+          await vscode.window.showTextDocument(file);
+        } catch {
+          const action = await vscode.window.showInformationMessage(
+            `No agent file for "${agentId}" yet. Deploy the army?`,
+            'Set Up the Army',
+          );
+          if (action) vscode.commands.executeCommand('commandCentre.setup');
+        }
+      },
+    ),
+
+    vscode.commands.registerCommand('commandCentre.briefAgent', () => {
+      vscode.commands.executeCommand('workbench.action.chat.open', { query: '@army ' });
     }),
 
     vscode.commands.registerCommand('commandCentre.askSquad', (agentId?: string) => {

@@ -1,50 +1,94 @@
 /**
  * The Activity Bar sidebar — the army, shown natively in VS Code.
  *
- * An "Army" tree of agents (each with a live status) and a "Skills" tree of
- * prompt files. Both read the workspace `.github/` folder. No webview — this
- * is the extension's own surface, themed by VS Code.
+ * The "Army" tree is hierarchical: each agent expands to reveal its tools, its
+ * handoffs, and the skills it can run. Each agent carries a live status. The
+ * "Skills" tree lists every prompt-file skill. No webview — VS Code's own UI.
  */
 
 import * as vscode from 'vscode';
-import { SQUAD, findAgentFiles, findSkillFiles } from './squadData';
+import {
+  SQUAD,
+  findAgentFiles,
+  findSkillFiles,
+  readAgentMeta,
+  readSkills,
+  type SkillRef,
+} from './squadData';
 
-/* ── Army roster tree ─────────────────────────────────────── */
+/* ── Army roster tree (hierarchical) ──────────────────────── */
 
-class AgentItem extends vscode.TreeItem {
+class AgentNode extends vscode.TreeItem {
+  readonly kind = 'agent' as const;
   constructor(
     public readonly agentId: string,
+    public readonly agentName: string,
     label: string,
     role: string,
     blurb: string,
-    recruited: boolean,
+    public readonly recruited: boolean,
     status: string | undefined,
     fileUri?: vscode.Uri,
   ) {
-    super(label, vscode.TreeItemCollapsibleState.None);
+    super(
+      label,
+      recruited
+        ? vscode.TreeItemCollapsibleState.Collapsed
+        : vscode.TreeItemCollapsibleState.None,
+    );
     const working = status === 'working';
-    this.description = recruited
-      ? working
-        ? `${role}  ·  working…`
-        : role
-      : 'not recruited yet';
+    this.description = recruited ? (working ? `${role}  ·  working…` : role) : 'not recruited yet';
     this.tooltip = new vscode.MarkdownString(
       `**${label}** — ${role}\n\n${blurb}${working ? '\n\n_On a task…_' : ''}`,
     );
-    this.contextValue = 'agent';
+    this.contextValue = recruited ? 'agent' : 'agentMissing';
     this.iconPath = new vscode.ThemeIcon(
       working ? 'loading~spin' : recruited ? 'pass-filled' : 'circle-large-outline',
     );
     if (recruited && fileUri) {
-      this.command = { command: 'vscode.open', title: 'Open agent file', arguments: [fileUri] };
       this.resourceUri = fileUri;
-    } else {
+    } else if (!recruited) {
       this.command = { command: 'commandCentre.setup', title: 'Set up the army' };
     }
   }
 }
 
-export class SquadTreeProvider implements vscode.TreeDataProvider<AgentItem> {
+class InfoNode extends vscode.TreeItem {
+  readonly kind = 'info' as const;
+  constructor(label: string, value: string, icon: string) {
+    super(label, vscode.TreeItemCollapsibleState.None);
+    this.description = value;
+    this.iconPath = new vscode.ThemeIcon(icon);
+  }
+}
+
+class SkillsGroupNode extends vscode.TreeItem {
+  readonly kind = 'skills' as const;
+  constructor(public readonly skills: SkillRef[]) {
+    super(
+      'Skills',
+      skills.length
+        ? vscode.TreeItemCollapsibleState.Collapsed
+        : vscode.TreeItemCollapsibleState.None,
+    );
+    this.description = skills.length ? String(skills.length) : 'none';
+    this.iconPath = new vscode.ThemeIcon('zap');
+  }
+}
+
+class SkillNode extends vscode.TreeItem {
+  readonly kind = 'skillitem' as const;
+  constructor(skill: SkillRef) {
+    super(`/${skill.name}`, vscode.TreeItemCollapsibleState.None);
+    this.iconPath = new vscode.ThemeIcon('zap');
+    this.tooltip = `Run with /${skill.name} in Copilot Chat`;
+    this.command = { command: 'vscode.open', title: 'Open skill', arguments: [skill.uri] };
+  }
+}
+
+type Node = AgentNode | InfoNode | SkillsGroupNode | SkillNode;
+
+export class SquadTreeProvider implements vscode.TreeDataProvider<Node> {
   private readonly changed = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.changed.event;
   private readonly statuses = new Map<string, string>();
@@ -60,31 +104,55 @@ export class SquadTreeProvider implements vscode.TreeDataProvider<AgentItem> {
     this.changed.fire();
   }
 
-  getTreeItem(item: AgentItem): vscode.TreeItem {
-    return item;
+  getTreeItem(node: Node): vscode.TreeItem {
+    return node;
   }
 
-  async getChildren(): Promise<AgentItem[]> {
+  async getChildren(element?: Node): Promise<Node[]> {
+    if (!element) return this.agents();
+    if (element.kind === 'agent') return this.agentChildren(element);
+    if (element.kind === 'skills') return element.skills.map((s) => new SkillNode(s));
+    return [];
+  }
+
+  private async agents(): Promise<AgentNode[]> {
     const files = await findAgentFiles();
     const byId = new Map(
       files.map((uri) => [uri.path.split('/').pop()!.replace('.agent.md', ''), uri]),
     );
-    return SQUAD.map((agent) => {
-      const uri = byId.get(agent.id);
-      return new AgentItem(
-        agent.id,
-        `${agent.emoji}  ${agent.name}`,
-        agent.role,
-        agent.blurb,
-        Boolean(uri),
-        this.statuses.get(agent.id),
-        uri,
-      );
-    });
+    return SQUAD.map(
+      (a) =>
+        new AgentNode(
+          a.id,
+          a.name,
+          `${a.emoji}  ${a.name}`,
+          a.role,
+          a.blurb,
+          byId.has(a.id),
+          this.statuses.get(a.id),
+          byId.get(a.id),
+        ),
+    );
+  }
+
+  private async agentChildren(agent: AgentNode): Promise<Node[]> {
+    const meta = await readAgentMeta(agent.agentId);
+    const skills = (await readSkills()).filter(
+      (s) => s.agent.toLowerCase() === agent.agentName.toLowerCase(),
+    );
+    return [
+      new InfoNode('Tools', meta.tools.length ? meta.tools.join(' · ') : 'none', 'tools'),
+      new InfoNode(
+        'Handoffs',
+        meta.handoffs.length ? `→ ${meta.handoffs.join(', ')}` : 'none',
+        'arrow-right',
+      ),
+      new SkillsGroupNode(skills),
+    ];
   }
 }
 
-/* ── Skills tree ──────────────────────────────────────────── */
+/* ── Skills tree (every skill, flat) ──────────────────────── */
 
 class SkillItem extends vscode.TreeItem {
   constructor(name: string, fileUri: vscode.Uri) {

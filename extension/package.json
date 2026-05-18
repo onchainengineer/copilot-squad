@@ -51,7 +51,8 @@
       { "command": "commandCentre.setup", "title": "Set Up the Army in This Workspace", "category": "Copilot Command Centre", "icon": "$(rocket)" },
       { "command": "commandCentre.recruit", "title": "Recruit a New Agent", "category": "Copilot Command Centre", "icon": "$(add)" },
       { "command": "commandCentre.refresh", "title": "Refresh the Army", "category": "Copilot Command Centre", "icon": "$(refresh)" },
-      { "command": "commandCentre.openAgent", "title": "Open Agent File", "category": "Copilot Command Centre" },
+      { "command": "commandCentre.openAgent", "title": "Open Agent File", "category": "Copilot Command Centre", "icon": "$(go-to-file)" },
+      { "command": "commandCentre.briefAgent", "title": "Brief the Army", "category": "Copilot Command Centre", "icon": "$(comment-discussion)" },
       { "command": "commandCentre.askSquad", "title": "Ask the Centre (@army)", "category": "Copilot Command Centre", "icon": "$(comment-discussion)" },
       { "command": "commandCentre.runSkill", "title": "Run Skill", "category": "Copilot Command Centre" }
     ],
@@ -62,7 +63,8 @@
         { "command": "commandCentre.refresh", "when": "view == commandCentre.roster", "group": "navigation@4" }
       ],
       "view/item/context": [
-        { "command": "commandCentre.askSquad", "when": "view == commandCentre.roster && viewItem == agent", "group": "inline" }
+        { "command": "commandCentre.briefAgent", "when": "view == commandCentre.roster && viewItem == agent", "group": "inline@1" },
+        { "command": "commandCentre.openAgent", "when": "view == commandCentre.roster && viewItem == agent", "group": "inline@2" }
       ]
     },
     "walkthroughs": [
