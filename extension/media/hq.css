@@ -387,6 +387,13 @@ code {
 .ss-row {
   padding: 9px 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.14s ease;
+}
+
+.ss-row:hover {
+  background: rgba(255, 255, 255, 0.035);
 }
 
 .ss-row:last-child {
