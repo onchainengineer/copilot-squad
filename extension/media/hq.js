@@ -1,87 +1,19 @@
-/* Squad HQ — webview controller. Plain ES5-ish JS, no modules (webview context). */
+/* Squad HQ — webview controller. Plain JS, no modules (webview context).
+ * Mascot art + frame generation lives in sprites.js (window.Squad). */
 (function () {
   'use strict';
   var vscode = acquireVsCodeApi();
   var SQUAD = window.__SQUAD__ || [];
-  var INK = '#141926';
+  var Sprite = window.Squad;
+  var FRAME_W = 64;
 
-  /* ── Mascot art ─────────────────────────────────────────── */
-  function eyes(cy, dx) {
-    cy = cy || 50;
-    dx = dx || 13;
-    return (
-      '<circle cx="' + (50 - dx) + '" cy="' + cy + '" r="7" fill="#fff"/>' +
-      '<circle cx="' + (50 + dx) + '" cy="' + cy + '" r="7" fill="#fff"/>' +
-      '<circle cx="' + (50 - dx + 1) + '" cy="' + (cy + 1) + '" r="4" fill="' + INK + '"/>' +
-      '<circle cx="' + (50 + dx + 1) + '" cy="' + (cy + 1) + '" r="4" fill="' + INK + '"/>' +
-      '<circle cx="' + (50 - dx + 2.5) + '" cy="' + (cy - 0.5) + '" r="1.6" fill="#fff"/>' +
-      '<circle cx="' + (50 + dx + 2.5) + '" cy="' + (cy - 0.5) + '" r="1.6" fill="#fff"/>'
-    );
+  function stripHTML(animal, color, state) {
+    return Sprite.frames(animal, color, state)
+      .map(function (svg) {
+        return '<div class="frame">' + svg + '</div>';
+      })
+      .join('');
   }
-  var BUILDERS = {
-    fox: function (c) {
-      return (
-        '<path d="M20 40 L30 6 L48 32 Z" fill="' + c + '"/><path d="M80 40 L70 6 L52 32 Z" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="58" rx="35" ry="33" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="72" rx="22" ry="17" fill="#fff" opacity=".95"/>' +
-        eyes(53, 14) + '<ellipse cx="50" cy="66" rx="5.5" ry="4.2" fill="' + INK + '"/>'
-      );
-    },
-    beaver: function (c) {
-      return (
-        '<circle cx="26" cy="24" r="11" fill="' + c + '"/><circle cx="74" cy="24" r="11" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="60" rx="36" ry="34" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="70" rx="20" ry="16" fill="#fff" opacity=".9"/>' +
-        eyes(50, 13) + '<ellipse cx="50" cy="64" rx="4.5" ry="3.5" fill="' + INK + '"/>' +
-        '<rect x="44" y="69" width="5.5" height="11" rx="1.5" fill="#fff"/>' +
-        '<rect x="50.5" y="69" width="5.5" height="11" rx="1.5" fill="#fff"/>'
-      );
-    },
-    hawk: function (c) {
-      return (
-        '<path d="M16 36 L34 14 L42 34 Z" fill="' + c + '"/><path d="M84 36 L66 14 L58 34 Z" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="56" rx="35" ry="34" fill="' + c + '"/>' + eyes(50, 14) +
-        '<path d="M50 60 L60 66 L50 78 L40 66 Z" fill="#f9b234"/>'
-      );
-    },
-    octopus: function (c) {
-      return (
-        '<path d="M14 76 q6 14 12 0 q6 14 12 0 q6 14 12 0 q6 14 12 0 q6 14 12 0 q6 14 12 0" ' +
-        'fill="none" stroke="' + c + '" stroke-width="9" stroke-linecap="round"/>' +
-        '<ellipse cx="50" cy="48" rx="36" ry="34" fill="' + c + '"/>' + eyes(46, 14) +
-        '<path d="M40 62 q10 9 20 0" fill="none" stroke="' + INK + '" stroke-width="3.5" stroke-linecap="round"/>'
-      );
-    },
-    owl: function (c) {
-      return (
-        '<path d="M22 22 L32 6 L40 24 Z" fill="' + c + '"/><path d="M78 22 L68 6 L60 24 Z" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="56" rx="36" ry="35" fill="' + c + '"/>' +
-        '<circle cx="37" cy="50" r="15" fill="#fff" opacity=".95"/><circle cx="63" cy="50" r="15" fill="#fff" opacity=".95"/>' +
-        '<circle cx="38" cy="51" r="7" fill="' + INK + '"/><circle cx="62" cy="51" r="7" fill="' + INK + '"/>' +
-        '<circle cx="40" cy="49" r="2.4" fill="#fff"/><circle cx="64" cy="49" r="2.4" fill="#fff"/>' +
-        '<path d="M50 60 L57 67 L50 74 L43 67 Z" fill="#f9b234"/>'
-      );
-    },
-    corgi: function (c) {
-      return (
-        '<path d="M50 30 L84 50 L78 86 L22 86 L16 50 Z" fill="#f9b234" opacity=".9"/>' +
-        '<path d="M22 42 L30 8 L46 34 Z" fill="' + c + '"/><path d="M78 42 L70 8 L54 34 Z" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="58" rx="35" ry="33" fill="' + c + '"/>' +
-        '<ellipse cx="50" cy="72" rx="23" ry="17" fill="#fff" opacity=".95"/>' +
-        eyes(53, 14) + '<ellipse cx="50" cy="66" rx="5" ry="4" fill="' + INK + '"/>' +
-        '<path d="M44 76 q6 8 12 0 Z" fill="#ff7a8a"/>'
-      );
-    },
-  };
-  function mascot(agent) {
-    var build = BUILDERS[agent.animal];
-    var inner = build
-      ? build(agent.color)
-      : '<ellipse cx="50" cy="56" rx="35" ry="34" fill="' + agent.color + '"/>' + eyes(50, 13);
-    return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>';
-  }
-
-  var IDLE = ['standing by', 'systems nominal', 'ready', 'on watch', 'awaiting orders'];
 
   /* ── Layout ─────────────────────────────────────────────── */
   var app = document.getElementById('app');
@@ -119,7 +51,7 @@
     card.id = 'agent-' + agent.id;
     card.style.setProperty('--accent', agent.color);
     card.innerHTML =
-      '<div class="agent-svg">' + mascot(agent) + '</div>' +
+      '<div class="agent-svg">' + Sprite.frame(agent.animal, agent.color, 'idle', 2) + '</div>' +
       '<div class="agent-info"><h3>' + agent.name + '</h3>' +
       '<div class="role">' + agent.role + '</div>' +
       '<div class="blurb">' + agent.blurb + '</div></div>' +
@@ -130,9 +62,8 @@
     grid.appendChild(card);
   });
 
-  /* ── Roaming pets ───────────────────────────────────────── */
+  /* ── Roaming sprite pets ────────────────────────────────── */
   var deck = document.getElementById('deck');
-  var SIZE = 60;
   var pets = SQUAD.map(function (agent, i) {
     var el = document.createElement('button');
     el.className = 'pet';
@@ -140,27 +71,32 @@
     el.title = agent.name + ' — ' + agent.role;
     el.innerHTML =
       '<span class="pet-bubble"></span>' +
-      '<span class="pet-svg">' + mascot(agent) + '</span>' +
+      '<span class="sprite"><span class="strip"></span></span>' +
       '<span class="pet-name">' + agent.name + '</span>';
     deck.appendChild(el);
+
     var pet = {
       agent: agent,
       el: el,
-      svg: el.querySelector('.pet-svg'),
+      sprite: el.querySelector('.sprite'),
+      strip: el.querySelector('.strip'),
       bubble: el.querySelector('.pet-bubble'),
-      x: 14 + i * (SIZE + 18),
+      x: 14 + i * (FRAME_W + 14),
       dir: Math.random() < 0.5 ? -1 : 1,
-      speed: 0.02 + Math.random() * 0.035,
-      phase: Math.random() * 6.28,
-      busy: false,
-      cheerUntil: 0,
+      speed: 0.022 + Math.random() * 0.03,
+      mode: 'walk',
+      state: '',
+      restUntil: 0,
       bubbleTimer: 0,
+      modeTimer: 0,
     };
+    setSprite(pet, 'walk');
+
     el.addEventListener('click', function () {
       vscode.postMessage({ type: 'select', agentId: agent.id });
     });
     el.addEventListener('mouseenter', function () {
-      say(pet, agent.name + ': ' + IDLE[(Math.random() * IDLE.length) | 0], 3200);
+      say(pet, agent.name + ' — ' + agent.role, 3000);
     });
     return pet;
   });
@@ -168,6 +104,13 @@
   pets.forEach(function (p) {
     petById[p.agent.id] = p;
   });
+
+  function setSprite(pet, state) {
+    if (pet.state === state) return;
+    pet.state = state;
+    pet.strip.style.setProperty('--dur', Sprite.states[state] || '0.72s');
+    pet.strip.innerHTML = stripHTML(pet.agent.animal, pet.agent.color, state);
+  }
 
   function say(pet, text, ms) {
     pet.bubble.textContent = text;
@@ -182,11 +125,10 @@
   function frame(now) {
     var dt = Math.min(now - last, 48);
     last = now;
-    var max = deck.clientWidth - SIZE - 14;
+    var max = deck.clientWidth - FRAME_W - 14;
+
     pets.forEach(function (pet) {
-      pet.phase += dt * 0.005;
-      var cheering = now < pet.cheerUntil;
-      if (!pet.busy && !cheering) {
+      if (pet.mode === 'walk') {
         pet.x += pet.dir * pet.speed * dt;
         if (pet.x <= 14) {
           pet.x = 14;
@@ -195,13 +137,18 @@
           pet.x = Math.max(14, max);
           pet.dir = -1;
         }
-        if (Math.random() < 0.001) pet.dir = -pet.dir;
+        if (Math.random() < 0.0009) pet.dir = -pet.dir;
+        if (Math.random() < 0.0014) {
+          pet.mode = 'rest';
+          pet.restUntil = now + 1400 + Math.random() * 2400;
+          setSprite(pet, 'idle');
+        }
+      } else if (pet.mode === 'rest' && now > pet.restUntil) {
+        pet.mode = 'walk';
+        setSprite(pet, 'walk');
       }
-      var bob = cheering
-        ? -Math.abs(Math.sin(pet.phase * 3)) * 14
-        : Math.sin(pet.phase) * (pet.busy ? 6 : 4);
-      pet.el.style.transform = 'translate(' + pet.x + 'px,' + bob + 'px)';
-      pet.svg.style.transform = 'scaleX(' + pet.dir + ')';
+      pet.el.style.transform = 'translateX(' + pet.x.toFixed(1) + 'px)';
+      pet.sprite.style.transform = 'scaleX(' + pet.dir + ')';
     });
     requestAnimationFrame(frame);
   }
@@ -227,18 +174,12 @@
     while (stream.children.length > 8) stream.removeChild(stream.lastChild);
   }
 
-  function setBusy(agentId, on) {
-    var pet = petById[agentId];
+  function setCard(agentId, working) {
     var card = document.getElementById('agent-' + agentId);
-    if (pet) {
-      pet.busy = on;
-      pet.el.classList.toggle('busy', on);
-    }
-    if (card) {
-      card.classList.toggle('busy', on);
-      var state = card.querySelector('.agent-state');
-      if (state) state.textContent = on ? 'Working' : 'Idle';
-    }
+    if (!card) return;
+    card.classList.toggle('busy', working);
+    var state = card.querySelector('.agent-state');
+    if (state) state.textContent = working ? 'Working' : 'Idle';
   }
 
   /* ── Messages from the extension ────────────────────────── */
@@ -248,21 +189,31 @@
       var agent = SQUAD.filter(function (a) {
         return a.id === msg.agentId;
       })[0];
-      if (!agent) return;
-      setBusy(msg.agentId, true);
       var pet = petById[msg.agentId];
-      if (pet) say(pet, '⚙ ' + msg.text, 4200);
+      if (!agent || !pet) return;
+      pet.mode = 'busy';
+      pet.el.classList.add('busy');
+      setSprite(pet, 'idle');
+      say(pet, '⚙ ' + msg.text, 4400);
+      setCard(msg.agentId, true);
       addEvent(agent, msg.text);
-      clearTimeout(petById[msg.agentId] && petById[msg.agentId]._t);
-      var t = setTimeout(function () {
-        setBusy(msg.agentId, false);
-      }, 4200);
-      if (pet) pet._t = t;
+      clearTimeout(pet.modeTimer);
+      pet.modeTimer = setTimeout(function () {
+        pet.mode = 'walk';
+        pet.el.classList.remove('busy');
+        setSprite(pet, 'walk');
+        setCard(msg.agentId, false);
+      }, 4400);
     } else if (msg.type === 'cheer') {
-      var now = performance.now();
-      pets.forEach(function (p) {
-        p.cheerUntil = now + 1700;
-        say(p, '✨', 1500);
+      pets.forEach(function (pet) {
+        pet.mode = 'cheer';
+        setSprite(pet, 'cheer');
+        say(pet, '✨', 1700);
+        clearTimeout(pet.modeTimer);
+        pet.modeTimer = setTimeout(function () {
+          pet.mode = 'walk';
+          setSprite(pet, 'walk');
+        }, 1900);
       });
       addEvent(null, msg.text || 'Squad assembled.');
     }

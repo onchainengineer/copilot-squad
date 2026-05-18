@@ -157,9 +157,9 @@ code {
 .pet {
   position: absolute;
   left: 0;
-  bottom: 14px;
-  width: 60px;
-  height: 78px;
+  bottom: 12px;
+  width: 64px;
+  height: 84px;
   border: 0;
   background: none;
   padding: 0;
@@ -172,9 +172,9 @@ code {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 2px;
-  width: 110px;
-  height: 110px;
+  bottom: 6px;
+  width: 116px;
+  height: 116px;
   transform: translateX(-50%);
   background: radial-gradient(circle, var(--accent), transparent 62%);
   opacity: 0;
@@ -183,26 +183,48 @@ code {
 }
 
 .pet.busy::before {
-  opacity: 0.42;
+  opacity: 0.4;
 }
 
-.pet-svg {
+/* sprite — 8 frames in a strip, flipped by a compositor-driven steps() loop */
+.sprite {
   display: block;
-  width: 52px;
-  height: 52px;
+  width: 64px;
+  height: 64px;
   margin: 0 auto;
-  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
-  transition: filter 0.2s ease, width 0.3s ease, height 0.3s ease;
+  overflow: hidden;
 }
 
-.pet:hover .pet-svg,
-.pet.busy .pet-svg {
-  filter: drop-shadow(0 0 13px var(--accent)) drop-shadow(0 5px 7px rgba(0, 0, 0, 0.55));
+.strip {
+  display: flex;
+  width: 512px;
+  will-change: transform;
+  animation: sprite-step var(--dur, 0.72s) steps(8) infinite;
 }
 
-.pet.busy .pet-svg {
-  width: 60px;
-  height: 60px;
+.frame {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+}
+
+.frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  transition: filter 0.25s ease;
+}
+
+.pet:hover .frame svg,
+.pet.busy .frame svg {
+  filter: drop-shadow(0 0 12px var(--accent)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+}
+
+@keyframes sprite-step {
+  to {
+    transform: translateX(-512px);
+  }
 }
 
 .pet-name {
@@ -326,9 +348,15 @@ code {
 }
 
 .agent-svg {
-  width: 46px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
   flex-shrink: 0;
+}
+
+.agent-svg svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.5));
 }
 
 .agent-info {
