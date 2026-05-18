@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Copilot Command Centre — GitHub-native command-centre theme
+   Copilot Command Centre — Grafana-style operations dashboard.
    Flat, crisp, dark, mono-forward, green accent. No blur, no glow.
    ═══════════════════════════════════════════════════════════ */
 
@@ -20,6 +20,7 @@
   --yellow: #e3b341;
 
   --inset: #010409;
+  --code-bg: #010409;
 
   --mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Arial, sans-serif;
@@ -44,34 +45,6 @@ body {
   font-size: 13px;
 }
 
-#app {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 24px 24px 44px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-/* ── Type system ──────────────────────────────────────────── */
-
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--green);
-  font-weight: 600;
-}
-
-.label {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-
 code {
   font-family: var(--mono);
   font-size: 0.86em;
@@ -82,494 +55,486 @@ code {
   padding: 1px 5px;
 }
 
-pre {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--fg);
-  background: var(--inset);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px 14px;
-  overflow-x: auto;
-}
-
 /* ── Top bar ──────────────────────────────────────────────── */
 
-.topbar {
+.cc-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
-  padding-bottom: 20px;
+  padding: 14px 26px;
+  background: var(--panel);
   border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 
-.brand {
+.cc-brand {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
 }
 
-.brand-mark {
+.cc-mark {
   width: 40px;
   height: 40px;
   display: grid;
   place-items: center;
   font-size: 20px;
-  border-radius: 10px;
-  background: var(--panel2);
+  background: var(--code-bg);
   border: 1px solid var(--line);
+  border-radius: 9px;
 }
 
-.brand-text .eyebrow {
+.cc-eyebrow {
   display: block;
-  margin-bottom: 4px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--green);
 }
 
-.brand-text h1 {
-  font-family: var(--sans);
+.cc-brand h1 {
   font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #fff;
+  line-height: 1.15;
 }
 
-.status-chip {
+.cc-status {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
   font-family: var(--mono);
   font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--muted);
-  background: var(--inset);
-  border: 1px solid var(--line);
-  border-radius: 999px;
 }
 
-.status-chip .dot {
+.cc-status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--green);
-  animation: breathe 2.6s ease-in-out infinite;
+  box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.16);
 }
 
-/* ── The Deck (roaming soldiers) ──────────────────────────── */
+.cc-status-sep {
+  color: var(--line);
+}
 
-.deck {
-  position: relative;
-  height: 134px;
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--panel2);
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent 0 39px,
-    rgba(110, 118, 129, 0.07) 39px 40px
-  );
+.cc-clock {
+  margin-left: 6px;
+  padding: 3px 9px;
+  background: var(--code-bg);
   border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
 }
 
-.deck::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 12px;
-  height: 1px;
-  background: var(--line);
-}
+/* ── Dashboard grid ───────────────────────────────────────── */
 
-.deck-label {
-  position: absolute;
-  top: 12px;
-  left: 14px;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-
-.pet {
-  position: absolute;
-  left: 0;
-  bottom: 12px;
-  width: 64px;
-  height: 84px;
-  border: 0;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  will-change: transform;
-  transition: opacity 0.4s ease;
-}
-
-.pet::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 6px;
-  width: 96px;
-  height: 96px;
-  transform: translateX(-50%);
-  background: radial-gradient(circle, var(--accent), transparent 64%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.pet.busy::before {
-  opacity: 0.22;
-}
-
-/* sprite — 8 frames in a strip, flipped by a compositor-driven steps() loop.
-   display:block is REQUIRED: .sprite is a <span>, and inline elements ignore
-   overflow:hidden — without it all 8 frames show at once. */
-.sprite {
-  display: block;
-  width: 64px;
-  height: 64px;
+.cc-grid {
+  max-width: 1200px;
   margin: 0 auto;
-  overflow: hidden;
-}
-
-.strip {
+  padding: 18px 26px 12px;
   display: flex;
-  width: 512px;
-  will-change: transform;
-  animation: sprite-step var(--dur, 0.72s) steps(8) infinite;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.frame {
-  width: 64px;
-  height: 64px;
-  flex: 0 0 64px;
-}
-
-.frame svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 3px 4px rgba(1, 4, 9, 0.7));
-  transition: filter 0.25s ease;
-}
-
-.pet:hover .frame svg,
-.pet.busy .frame svg {
-  filter: drop-shadow(0 0 6px var(--accent)) drop-shadow(0 3px 4px rgba(1, 4, 9, 0.7));
-}
-
-@keyframes sprite-step {
-  to {
-    transform: translateX(-512px);
-  }
-}
-
-.pet-name {
-  display: block;
-  text-align: center;
-  margin-top: 4px;
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-
-.pet:hover .pet-name,
-.pet.busy .pet-name {
-  color: var(--accent);
-}
-
-.pet-bubble {
-  position: absolute;
-  bottom: 74px;
-  left: 50%;
-  transform: translateX(-50%) translateY(6px) scale(0.92);
-  white-space: nowrap;
-  max-width: 230px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 5px 10px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--fg);
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.16s ease, transform 0.16s ease;
-}
-
-.pet-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 8px;
-  height: 8px;
-  background: var(--panel);
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.pet-bubble.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0) scale(1);
-}
-
-/* ── Section scaffold ─────────────────────────────────────── */
-
-.section-head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 13px;
-}
-
-.section-head h2 {
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--fg);
-}
-
-.section-head .eyebrow {
-  font-size: 10px;
-  letter-spacing: 0.2em;
-}
-
-.section-head .tick {
-  width: 7px;
-  height: 7px;
-  border-radius: 2px;
-  background: var(--green);
-}
-
-.section-head .count {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-
-/* ── Agent grid ───────────────────────────────────────────── */
-
-.grid {
+.cc-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(262px, 1fr));
-  gap: 12px;
-}
-
-.agent {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 14px;
-  border-radius: 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  cursor: pointer;
-  overflow: hidden;
-  transition: border-color 0.16s ease, background 0.16s ease;
-}
-
-.agent:hover {
-  border-color: var(--blue);
-  background: var(--panel2);
-}
-
-.agent::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--accent);
-  opacity: 0;
-  transition: opacity 0.16s ease;
-}
-
-.agent:hover::before,
-.agent.busy::before {
-  opacity: 1;
-}
-
-.agent-svg {
-  width: 50px;
-  height: 50px;
-  flex-shrink: 0;
-}
-
-.agent-svg svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 2px 4px rgba(1, 4, 9, 0.6));
-}
-
-.agent-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.agent-info h3 {
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 750;
-  letter-spacing: -0.01em;
-  color: #fff;
-}
-
-.agent-info .role {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-top: 2px;
-}
-
-.agent-info .blurb {
-  font-size: 11.5px;
-  color: var(--muted);
-  margin-top: 6px;
-  line-height: 1.45;
-}
-
-.agent-state {
-  position: absolute;
-  top: 12px;
-  right: 13px;
-  font-family: var(--mono);
-  font-size: 8.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 999px;
-  color: var(--dim);
-  background: var(--inset);
-  border: 1px solid var(--line);
-  transition: all 0.2s ease;
-}
-
-.agent.busy .agent-state {
-  color: var(--green);
-  border-color: var(--green);
-  background: rgba(63, 185, 80, 0.12);
+  grid-template-columns: 1.45fr 1fr;
+  gap: 14px;
 }
 
 /* ── Panels ───────────────────────────────────────────────── */
 
-.panel {
+.gf-panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 16px 18px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.panel.dark {
-  background: var(--panel2);
+.gf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.014);
 }
 
-/* ── Callout ──────────────────────────────────────────────── */
+.gf-title {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--fg);
+}
 
-.callout {
-  border-radius: 10px;
+.gf-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.gf-body {
+  padding: 14px;
+}
+
+/* ── Stat tiles ───────────────────────────────────────────── */
+
+.gf-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.gf-stat {
+  background: var(--panel);
   border: 1px solid var(--line);
-  border-left: 4px solid var(--green);
-  background: linear-gradient(90deg, rgba(63, 185, 80, 0.08), transparent 70%);
-  padding: 12px 14px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.callout.blue {
-  border-left-color: var(--blue);
-  background: linear-gradient(90deg, rgba(88, 166, 255, 0.08), transparent 70%);
-}
-
-.callout.purple {
-  border-left-color: var(--purple);
-  background: linear-gradient(90deg, rgba(188, 140, 255, 0.08), transparent 70%);
-}
-
-.callout.red {
-  border-left-color: var(--red);
-  background: linear-gradient(90deg, rgba(248, 81, 73, 0.08), transparent 70%);
-}
-
-/* ── Activity stream ──────────────────────────────────────── */
-
-.stream {
+  border-radius: 8px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  max-height: 224px;
-  overflow-y: auto;
+  gap: 4px;
 }
 
-.stream:empty::before {
-  content: 'Standing by — command centre activity will appear here as you work.';
-  color: var(--dim);
+.gf-stat-num {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.gf-stat-num.bump {
+  animation: gf-bump 0.45s ease;
+  color: var(--green);
+}
+
+@keyframes gf-bump {
+  35% {
+    transform: scale(1.32);
+  }
+}
+
+.gf-stat-label {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
 
-.event {
+/* ── The Army · Live (roaming panel) ──────────────────────── */
+
+#army-live {
+  padding: 0;
+}
+
+.al-track {
+  position: relative;
+  height: 158px;
+  overflow: hidden;
+  background:
+    radial-gradient(var(--line) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--code-bg);
+}
+
+.al-track::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 30%, var(--line) 70%, transparent);
+}
+
+.al-unit {
+  position: absolute;
+  left: 0;
+  bottom: 16px;
+  width: 88px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.al-sprite {
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+}
+
+.al-sprite svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+.al-unit.busy .al-sprite svg,
+.al-unit:hover .al-sprite svg {
+  filter: drop-shadow(0 0 13px var(--accent)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+.al-name {
+  display: block;
+  text-align: center;
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.al-unit:hover .al-name {
+  color: var(--accent);
+}
+
+.al-bubble {
+  position: absolute;
+  bottom: 74px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 3px 9px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--muted);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.al-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 7px;
+  height: 7px;
+  background: var(--panel2);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.al-bubble[data-status='working'] {
+  color: #0c1120;
+  background: var(--accent);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.al-bubble[data-status='working']::after {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.al-bubble[data-status='done'] {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 50%, var(--line));
+}
+
+/* ── Soldier Status table ─────────────────────────────────── */
+
+.ss-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.ss-head,
+.ss-row {
+  display: grid;
+  grid-template-columns: 1fr 130px 70px;
+  align-items: center;
+  gap: 10px;
+}
+
+.ss-head {
+  padding: 0 6px 8px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border-bottom: 1px solid var(--line);
+}
+
+.ss-row {
+  padding: 9px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.ss-row:last-child {
+  border-bottom: 0;
+}
+
+.ss-soldier {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 9px;
-  border-radius: 7px;
-  font-size: 12px;
-  border-left: 2px solid var(--accent);
-  animation: slidein 0.3s ease;
+  min-width: 0;
 }
 
-.event:nth-child(odd) {
-  background: rgba(110, 118, 129, 0.06);
+.ss-soldier svg {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
-.event .ev-emoji {
-  font-size: 14px;
+.ss-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.event .ev-agent {
+.ss-meta b {
+  font-size: 13px;
+  color: #fff;
+}
+
+.ss-meta em {
+  font-style: normal;
   font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--accent);
-  min-width: 56px;
 }
 
-.event .ev-text {
+.ss-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
   color: var(--muted);
 }
 
-.event .ev-time {
-  margin-left: auto;
+.ss-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dim);
+  flex-shrink: 0;
+}
+
+.ss-status[data-status='working'] {
+  color: var(--yellow);
+}
+
+.ss-status[data-status='working'] i {
+  background: var(--yellow);
+  box-shadow: 0 0 7px var(--yellow);
+  animation: ss-pulse 1.2s ease-in-out infinite;
+}
+
+.ss-status[data-status='done'] {
+  color: var(--green);
+}
+
+.ss-status[data-status='done'] i {
+  background: var(--green);
+}
+
+@keyframes ss-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.ss-missions b {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+/* ── Operations log ───────────────────────────────────────── */
+
+#ops-log {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+#ops-log:empty::before {
+  content: 'Standing by — operations will appear here as you work.';
+  font-size: 12px;
+  font-style: italic;
+  color: var(--dim);
+}
+
+.ops-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  border-left: 2px solid var(--accent);
+  animation: ops-in 0.3s ease;
+}
+
+.ops-line:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+@keyframes ops-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+}
+
+.ops-time {
+  font-family: var(--mono);
+  font-size: 10.5px;
   color: var(--dim);
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Actions ──────────────────────────────────────────────── */
+.ops-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  min-width: 64px;
+}
 
-.actions {
+.ops-text {
+  color: var(--muted);
+}
+
+/* ── Action buttons ───────────────────────────────────────── */
+
+.cc-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -614,25 +579,67 @@ pre {
   filter: brightness(1.08);
 }
 
-.foot {
-  text-align: center;
+/* ── Footer ───────────────────────────────────────────────── */
+
+.cc-foot {
+  max-width: 1200px;
+  margin: 8px auto 0;
+  padding: 18px 26px 30px;
   font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  font-size: 10.5px;
   color: var(--dim);
+  text-align: center;
 }
 
-/* ── Animations ───────────────────────────────────────────── */
+.cc-foot code {
+  color: var(--blue);
+}
 
-@keyframes slidein {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+@media (max-width: 820px) {
+  .gf-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cc-row {
+    grid-template-columns: 1fr;
   }
 }
 
-@keyframes breathe {
-  50% {
-    opacity: 0.35;
+/* ═══════════════════════════════════════════════════════════
+   Sprite strip — kept intact for the sprites.js frame engine.
+   .sprite { display:block } is REQUIRED: .sprite is a <span>, and
+   inline elements ignore overflow:hidden — without it all 8 frames
+   show at once.
+   ═══════════════════════════════════════════════════════════ */
+
+.sprite {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.strip {
+  display: flex;
+  width: 512px;
+  will-change: transform;
+  animation: sprite-step var(--dur, 0.72s) steps(8) infinite;
+}
+
+.frame {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+}
+
+.frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes sprite-step {
+  to {
+    transform: translateX(-512px);
   }
 }

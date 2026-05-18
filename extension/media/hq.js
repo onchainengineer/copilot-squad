@@ -1,190 +1,244 @@
 /* Command Centre — webview controller. Plain JS, no modules (webview context).
+ * A Grafana-style operations dashboard. The webview has no mission engine — it
+ * reacts to `postMessage` from the extension (`pulse` / `cheer`).
  * Soldier art + frame generation lives in sprites.js (window.Squad). */
 (function () {
   'use strict';
   var vscode = acquireVsCodeApi();
   var SQUAD = window.__SQUAD__ || [];
   var Sprite = window.Squad;
-  var FRAME_W = 64;
 
-  function stripHTML(animal, color, state) {
-    return Sprite.frames(animal, color, state)
-      .map(function (svg) {
-        return '<div class="frame">' + svg + '</div>';
-      })
-      .join('');
-  }
+  var UNIT_W = 88;
+  var BUSY_MS = 4400;
+  var AMBIENT = ['on watch', 'idle', 'ready', 'standing by', 'holding position'];
 
   /* ── Layout ─────────────────────────────────────────────── */
   var app = document.getElementById('app');
   app.innerHTML =
-    '<div class="topbar">' +
-    '  <div class="brand">' +
-    '    <div class="brand-mark">🐾</div>' +
-    '    <div class="brand-text">' +
-    '      <p class="eyebrow">GitHub Copilot</p>' +
-    '      <h1>Copilot Command Centre</h1>' +
+    '<header class="cc-top">' +
+    '  <div class="cc-brand">' +
+    '    <span class="cc-mark">🐾</span>' +
+    '    <div>' +
+    '      <span class="cc-eyebrow">GitHub Copilot</span>' +
+    '      <h1>Command Centre</h1>' +
     '    </div>' +
     '  </div>' +
-    '  <div class="status-chip"><span class="dot"></span>' + SQUAD.length + ' agents · operational</div>' +
-    '</div>' +
-    '<div class="deck" id="deck"><span class="deck-label">The Deck</span></div>' +
-    '<div>' +
-    '  <div class="section-head"><span class="tick"></span>' +
-    '    <span class="eyebrow">Roster</span><h2>Army Roster</h2>' +
-    '    <span class="count">' + SQUAD.length + ' agents</span></div>' +
-    '  <div class="grid" id="grid"></div>' +
-    '</div>' +
-    '<div>' +
-    '  <div class="section-head"><span class="tick"></span>' +
-    '    <span class="eyebrow">Telemetry</span><h2>Live Activity</h2>' +
-    '    <span class="count" id="ev-count">0 events</span></div>' +
-    '  <div class="panel"><div class="stream" id="stream"></div></div>' +
-    '</div>' +
-    '<div class="actions">' +
-    '  <button class="action primary" data-cmd="commandCentre.askSquad">💬 Ask the Centre</button>' +
-    '  <button class="action" data-cmd="commandCentre.recruit">➕ Recruit an Agent</button>' +
-    '  <button class="action" data-cmd="commandCentre.setup">🚀 Set Up the Army</button>' +
-    '</div>' +
-    '<div class="foot">Each soldier is a real Copilot agent · click one to put it to work</div>';
+    '  <div class="cc-status">' +
+    '    <span class="cc-status-dot"></span>' +
+    '    <span>Operational</span>' +
+    '    <span class="cc-status-sep">·</span>' +
+    '    <span>' + SQUAD.length + ' soldiers on duty</span>' +
+    '    <span class="cc-clock" id="cc-clock"></span>' +
+    '  </div>' +
+    '</header>' +
+    '<main class="cc-grid">' +
+    '  <section class="gf-stats" id="stats"></section>' +
+    '  <section class="gf-panel">' +
+    '    <div class="gf-head"><span class="gf-title">The Army · Live</span>' +
+    '      <span class="gf-tag" id="army-tag">standing by</span></div>' +
+    '    <div class="gf-body" id="army-live"></div>' +
+    '  </section>' +
+    '  <section class="gf-panel">' +
+    '    <div class="gf-head"><span class="gf-title">Mission Control</span>' +
+    '      <span class="gf-tag">deploy</span></div>' +
+    '    <div class="gf-body">' +
+    '      <div class="cc-actions">' +
+    '        <button class="action primary" data-cmd="commandCentre.askSquad">💬 Ask the Army</button>' +
+    '        <button class="action" data-cmd="commandCentre.recruit">➕ Recruit</button>' +
+    '        <button class="action" data-cmd="commandCentre.setup">🚀 Set Up the Army</button>' +
+    '      </div>' +
+    '    </div>' +
+    '  </section>' +
+    '  <div class="cc-row">' +
+    '    <section class="gf-panel">' +
+    '      <div class="gf-head"><span class="gf-title">Soldier Status</span>' +
+    '        <span class="gf-tag">' + SQUAD.length + ' units</span></div>' +
+    '      <div class="gf-body" id="soldier-status"></div>' +
+    '    </section>' +
+    '    <section class="gf-panel">' +
+    '      <div class="gf-head"><span class="gf-title">Operations Log</span>' +
+    '        <span class="gf-tag" id="ops-count">0 events</span></div>' +
+    '      <div class="gf-body" id="ops-log"></div>' +
+    '    </section>' +
+    '  </div>' +
+    '</main>' +
+    '<footer class="cc-foot">Copilot Command Centre · every soldier is a real Copilot agent in <code>.github/agents/</code></footer>';
 
-  /* ── Agent cards ────────────────────────────────────────── */
-  var grid = document.getElementById('grid');
-  SQUAD.forEach(function (agent) {
-    var card = document.createElement('div');
-    card.className = 'agent';
-    card.id = 'agent-' + agent.id;
-    card.style.setProperty('--accent', agent.color);
-    card.innerHTML =
-      '<div class="agent-svg">' + Sprite.frame(agent.animal, agent.color, 'idle', 2) + '</div>' +
-      '<div class="agent-info"><h3>' + agent.name + '</h3>' +
-      '<div class="role">' + agent.role + '</div>' +
-      '<div class="blurb">' + agent.blurb + '</div></div>' +
-      '<span class="agent-state">Idle</span>';
-    card.addEventListener('click', function () {
-      vscode.postMessage({ type: 'select', agentId: agent.id });
+  /* ── Live clock ─────────────────────────────────────────── */
+  var clock = document.getElementById('cc-clock');
+  function tick() {
+    clock.textContent = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     });
-    grid.appendChild(card);
-  });
+  }
+  tick();
+  setInterval(tick, 1000);
 
-  /* ── Roaming soldiers ───────────────────────────────────── */
-  var deck = document.getElementById('deck');
-  var pets = SQUAD.map(function (agent, i) {
+  /* ── Stat tiles ─────────────────────────────────────────── */
+  var stats = {
+    onduty: SQUAD.length,
+    events: 0,
+    recruited: 0,
+    skills: SQUAD.length,
+  };
+  var STAT_TILES = [
+    { id: 'onduty', label: 'Soldiers on duty' },
+    { id: 'events', label: 'Events observed' },
+    { id: 'recruited', label: 'Recruited' },
+    { id: 'skills', label: 'Skills' },
+  ];
+  var statsHost = document.getElementById('stats');
+  statsHost.innerHTML = STAT_TILES.map(function (t) {
+    return (
+      '<div class="gf-stat">' +
+      '<span class="gf-stat-num" id="stat-' + t.id + '">' + stats[t.id] + '</span>' +
+      '<span class="gf-stat-label">' + t.label + '</span>' +
+      '</div>'
+    );
+  }).join('');
+
+  function bumpStat(id, value) {
+    stats[id] = value;
+    var el = document.getElementById('stat-' + id);
+    if (!el) return;
+    el.textContent = String(value);
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+  }
+
+  /* ── The Army · Live (roaming, lane-based) ──────────────── */
+  var armyLive = document.getElementById('army-live');
+  var track = document.createElement('div');
+  track.className = 'al-track';
+  armyLive.appendChild(track);
+
+  var armyTag = document.getElementById('army-tag');
+
+  var units = SQUAD.map(function (agent, i) {
     var el = document.createElement('button');
-    el.className = 'pet';
+    el.className = 'al-unit';
     el.style.setProperty('--accent', agent.color);
     el.title = agent.name + ' — ' + agent.role;
     el.innerHTML =
-      '<span class="pet-bubble"></span>' +
-      '<span class="sprite"><span class="strip"></span></span>' +
-      '<span class="pet-name">' + agent.name + '</span>';
-    deck.appendChild(el);
-
-    var pet = {
-      agent: agent,
-      el: el,
-      sprite: el.querySelector('.sprite'),
-      strip: el.querySelector('.strip'),
-      bubble: el.querySelector('.pet-bubble'),
-      x: 14 + i * (FRAME_W + 14),
-      dir: Math.random() < 0.5 ? -1 : 1,
-      speed: 0.022 + Math.random() * 0.03,
-      mode: 'walk',
-      state: '',
-      restUntil: 0,
-      bubbleTimer: 0,
-      modeTimer: 0,
-    };
-    setSprite(pet, 'walk');
+      '<span class="al-bubble" data-status="idle">idle</span>' +
+      '<span class="al-sprite">' + Sprite.frame(agent.animal, agent.color, 'idle', 2) + '</span>' +
+      '<span class="al-name">' + agent.name + '</span>';
+    track.appendChild(el);
 
     el.addEventListener('click', function () {
       vscode.postMessage({ type: 'select', agentId: agent.id });
     });
-    el.addEventListener('mouseenter', function () {
-      say(pet, agent.name + ' — ' + agent.role, 3000);
-    });
-    return pet;
+
+    return {
+      agent: agent,
+      el: el,
+      sprite: el.querySelector('.al-sprite'),
+      bubble: el.querySelector('.al-bubble'),
+      x: 12 + i * (UNIT_W + 6),
+      dir: Math.random() < 0.5 ? -1 : 1,
+      speed: 0.02 + Math.random() * 0.03,
+      phase: Math.random() * 6.28,
+      status: 'idle',
+      ambient: i % AMBIENT.length,
+      ambientAt: 0,
+      busyTimer: 0,
+    };
   });
-  var petById = {};
-  pets.forEach(function (p) {
-    petById[p.agent.id] = p;
+  var unitById = {};
+  units.forEach(function (u) {
+    unitById[u.agent.id] = u;
   });
 
-  function setSprite(pet, state) {
-    if (pet.state === state) return;
-    pet.state = state;
-    pet.strip.style.setProperty('--dur', Sprite.states[state] || '0.72s');
-    pet.strip.innerHTML = stripHTML(pet.agent.animal, pet.agent.color, state);
+  function setUnitStatus(u, status, text) {
+    u.status = status;
+    u.bubble.dataset.status = status;
+    u.bubble.textContent = text;
+    u.el.classList.toggle('busy', status === 'working');
   }
 
-  function say(pet, text, ms) {
-    pet.bubble.textContent = text;
-    pet.bubble.classList.add('show');
-    clearTimeout(pet.bubbleTimer);
-    pet.bubbleTimer = setTimeout(function () {
-      pet.bubble.classList.remove('show');
-    }, ms);
-  }
-
-  var last = performance.now();
+  var lastFrame = performance.now();
   function frame(now) {
-    var dt = Math.min(now - last, 48);
-    last = now;
-    var max = deck.clientWidth - FRAME_W - 14;
-
-    pets.forEach(function (pet) {
-      if (pet.mode === 'walk') {
-        pet.x += pet.dir * pet.speed * dt;
-        if (pet.x <= 14) {
-          pet.x = 14;
-          pet.dir = 1;
-        } else if (pet.x >= max) {
-          pet.x = Math.max(14, max);
-          pet.dir = -1;
+    var dt = Math.min(now - lastFrame, 48);
+    lastFrame = now;
+    // each soldier patrols its own lane — bubbles never overlap
+    var lane = track.clientWidth / units.length;
+    units.forEach(function (u, i) {
+      u.phase += dt * 0.005;
+      var lo = i * lane + 6;
+      var hi = Math.max(lo, (i + 1) * lane - UNIT_W - 6);
+      if (u.x < lo) u.x = lo;
+      if (u.status !== 'working') {
+        u.x += u.dir * u.speed * dt;
+        if (u.x <= lo) {
+          u.x = lo;
+          u.dir = 1;
+        } else if (u.x >= hi) {
+          u.x = hi;
+          u.dir = -1;
         }
-        if (Math.random() < 0.0009) pet.dir = -pet.dir;
-        if (Math.random() < 0.0014) {
-          pet.mode = 'rest';
-          pet.restUntil = now + 1400 + Math.random() * 2400;
-          setSprite(pet, 'idle');
+        if (u.status === 'idle' && now > u.ambientAt) {
+          u.ambientAt = now + 4000 + Math.random() * 4500;
+          u.ambient = (u.ambient + 1) % AMBIENT.length;
+          u.bubble.textContent = AMBIENT[u.ambient];
         }
-      } else if (pet.mode === 'rest' && now > pet.restUntil) {
-        pet.mode = 'walk';
-        setSprite(pet, 'walk');
       }
-      pet.el.style.transform = 'translateX(' + pet.x.toFixed(1) + 'px)';
-      pet.sprite.style.transform = 'scaleX(' + pet.dir + ')';
+      var bob = Math.sin(u.phase) * (u.status === 'working' ? 6 : 4);
+      u.el.style.transform = 'translate(' + u.x.toFixed(1) + 'px, ' + bob.toFixed(1) + 'px)';
+      u.sprite.style.transform = 'scaleX(' + u.dir + ')';
     });
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
-  /* ── Activity stream ────────────────────────────────────── */
-  var stream = document.getElementById('stream');
-  var evCount = document.getElementById('ev-count');
-  var total = 0;
-  function addEvent(agent, text) {
-    total++;
-    evCount.textContent = total + (total === 1 ? ' event' : ' events');
-    var row = document.createElement('div');
-    row.className = 'event';
-    row.style.setProperty('--accent', agent ? agent.color : '#6b8cff');
-    var time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    row.innerHTML =
-      '<span class="ev-emoji">' + (agent ? agent.emoji : '🐾') + '</span>' +
-      '<span class="ev-agent">' + (agent ? agent.name : 'Army') + '</span>' +
-      '<span class="ev-text">' + text + '</span>' +
-      '<span class="ev-time">' + time + '</span>';
-    stream.insertBefore(row, stream.firstChild);
-    while (stream.children.length > 8) stream.removeChild(stream.lastChild);
+  /* ── Soldier Status table ───────────────────────────────── */
+  var soldierStatus = document.getElementById('soldier-status');
+  soldierStatus.innerHTML =
+    '<div class="ss-table">' +
+    '<div class="ss-head"><span>Soldier</span><span>Status</span><span>Events</span></div>' +
+    SQUAD.map(function (agent) {
+      return (
+        '<div class="ss-row" id="ss-' + agent.id + '" style="--accent:' + agent.color + '">' +
+        '<span class="ss-soldier">' + Sprite.frame(agent.animal, agent.color, 'idle', 2) +
+        '<span class="ss-meta"><b>' + agent.name + '</b><em>' + agent.role + '</em></span></span>' +
+        '<span class="ss-status" data-status="idle"><i></i>Idle</span>' +
+        '<span class="ss-missions"><b id="ssm-' + agent.id + '">0</b></span>' +
+        '</div>'
+      );
+    }).join('') +
+    '</div>';
+
+  var ssCounts = {};
+  function setSoldierStatus(agentId, status, label) {
+    var cell = document.querySelector('#ss-' + agentId + ' .ss-status');
+    if (!cell) return;
+    cell.dataset.status = status;
+    cell.innerHTML = '<i></i>' + label;
   }
 
-  function setCard(agentId, working) {
-    var card = document.getElementById('agent-' + agentId);
-    if (!card) return;
-    card.classList.toggle('busy', working);
-    var state = card.querySelector('.agent-state');
-    if (state) state.textContent = working ? 'Working' : 'Idle';
+  /* ── Operations Log ─────────────────────────────────────── */
+  var opsLog = document.getElementById('ops-log');
+  var opsCount = document.getElementById('ops-count');
+  var opsTotal = 0;
+  function pushOps(accent, tag, text) {
+    opsTotal++;
+    opsCount.textContent = opsTotal + (opsTotal === 1 ? ' event' : ' events');
+    var row = document.createElement('div');
+    row.className = 'ops-line';
+    row.style.setProperty('--accent', accent);
+    var time = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    row.innerHTML =
+      '<span class="ops-time">' + time + '</span>' +
+      '<span class="ops-tag">' + tag + '</span>' +
+      '<span class="ops-text">' + text + '</span>';
+    opsLog.insertBefore(row, opsLog.firstChild);
+    while (opsLog.children.length > 14) opsLog.removeChild(opsLog.lastChild);
   }
 
   /* ── Messages from the extension ────────────────────────── */
@@ -194,33 +248,50 @@
       var agent = SQUAD.filter(function (a) {
         return a.id === msg.agentId;
       })[0];
-      var pet = petById[msg.agentId];
-      if (!agent || !pet) return;
-      pet.mode = 'busy';
-      pet.el.classList.add('busy');
-      setSprite(pet, 'idle');
-      say(pet, '⚙ ' + msg.text, 4400);
-      setCard(msg.agentId, true);
-      addEvent(agent, msg.text);
-      clearTimeout(pet.modeTimer);
-      pet.modeTimer = setTimeout(function () {
-        pet.mode = 'walk';
-        pet.el.classList.remove('busy');
-        setSprite(pet, 'walk');
-        setCard(msg.agentId, false);
-      }, 4400);
+      var u = unitById[msg.agentId];
+      if (!agent || !u) return;
+
+      // stat tiles
+      bumpStat('events', stats.events + 1);
+
+      // army-live bubble
+      setUnitStatus(u, 'working', '⚙ ' + msg.text);
+      armyTag.textContent = 'mission active';
+
+      // soldier status table
+      setSoldierStatus(msg.agentId, 'working', 'Working');
+      ssCounts[msg.agentId] = (ssCounts[msg.agentId] || 0) + 1;
+      var counter = document.getElementById('ssm-' + msg.agentId);
+      if (counter) counter.textContent = String(ssCounts[msg.agentId]);
+
+      // ops log
+      pushOps(agent.color, 'DISPATCH', agent.name + ' → ' + msg.text);
+
+      clearTimeout(u.busyTimer);
+      u.busyTimer = setTimeout(function () {
+        setUnitStatus(u, 'idle', 'idle');
+        setSoldierStatus(msg.agentId, 'idle', 'Idle');
+        var stillBusy = units.some(function (x) {
+          return x.status === 'working';
+        });
+        if (!stillBusy) armyTag.textContent = 'standing by';
+      }, BUSY_MS);
     } else if (msg.type === 'cheer') {
-      pets.forEach(function (pet) {
-        pet.mode = 'cheer';
-        setSprite(pet, 'cheer');
-        say(pet, '✨', 1700);
-        clearTimeout(pet.modeTimer);
-        pet.modeTimer = setTimeout(function () {
-          pet.mode = 'walk';
-          setSprite(pet, 'walk');
+      bumpStat('recruited', stats.recruited + 1);
+      units.forEach(function (u) {
+        clearTimeout(u.busyTimer);
+        setUnitStatus(u, 'done', '✓');
+        u.busyTimer = setTimeout(function () {
+          if (u.status === 'done') setUnitStatus(u, 'idle', 'idle');
         }, 1900);
       });
-      addEvent(null, msg.text || 'Army assembled.');
+      SQUAD.forEach(function (a) {
+        setSoldierStatus(a.id, 'done', 'Done');
+        setTimeout(function () {
+          setSoldierStatus(a.id, 'idle', 'Idle');
+        }, 1900);
+      });
+      pushOps('#3fb950', 'RECRUIT', msg.text || 'Army assembled.');
     }
   });
 

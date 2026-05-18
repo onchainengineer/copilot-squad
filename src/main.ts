@@ -9,7 +9,6 @@
 import './style.css';
 import { squad } from './squad';
 import { MissionEngine } from './missions';
-import { mountArmyLive } from './armylive';
 import {
   renderStats,
   renderMissionControl,
@@ -43,11 +42,6 @@ app.innerHTML = `
     <section class="gf-stats" id="stats"></section>
 
     <section class="gf-panel">
-      <div class="gf-head"><span class="gf-title">The Army · Live</span><span class="gf-tag" id="army-tag">standing by</span></div>
-      <div class="gf-body" id="army-live"></div>
-    </section>
-
-    <section class="gf-panel">
       <div class="gf-head"><span class="gf-title">Mission Control</span><span class="gf-tag">deploy</span></div>
       <div class="gf-body" id="mission-control"></div>
     </section>
@@ -71,7 +65,6 @@ app.innerHTML = `
 
   <footer class="cc-foot">Copilot Command Centre · every soldier is a real Copilot agent in <code>.github/agents/</code></footer>`;
 
-mountArmyLive(document.querySelector<HTMLElement>('#army-live')!, engine);
 renderStats(document.querySelector<HTMLElement>('#stats')!, engine);
 renderMissionControl(document.querySelector<HTMLElement>('#mission-control')!, engine);
 renderSoldierStatus(document.querySelector<HTMLElement>('#soldier-status')!, engine);
