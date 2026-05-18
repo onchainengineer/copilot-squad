@@ -1,36 +1,49 @@
 # Copilot Squad — Repository Instructions
 
-<!--
-  LAB 1 ▸ This file is loaded into EVERY Copilot Chat request in this repo.
-  Right now it's a skeleton. Replace each TODO so it fully and accurately
-  describes the project. See labs/LAB-1-instructions.md.
-
-  Tip: select a TODO and ask Copilot Chat to fill it in from the real files.
--->
+These instructions are loaded automatically into **every** Copilot Chat request in
+this repo. Keep them short, true, and high-signal — this is the squad's shared brain.
 
 ## What this project is
 
-TODO: Describe Squad HQ in 2–3 sentences — what the app is, and that it is the
-playground for the Copilot Squad workshop.
+**Squad HQ** is a small Vite + TypeScript single-page app. It visualizes a squad of
+AI agents as animated mascot "pets" that wander a navbar. It is the playground for the
+*Copilot Squad* workshop — the app is where the agents do their work.
 
 ## Tech stack
 
-TODO: List the stack — Vite 5, vanilla TypeScript, plain DOM (no framework),
-one stylesheet, **zero runtime dependencies**. Add the rule: do not add npm
-packages.
+- **Vite 5** + **vanilla TypeScript** (no framework, no JSX).
+- Plain DOM APIs (`document.createElement`, `innerHTML`, `addEventListener`).
+- One stylesheet: `src/style.css`. No CSS framework, no preprocessor.
+- No runtime dependencies — keep it that way. Do not add npm packages.
 
 ## Project map
 
-TODO: A short table of what each file under `src/` does — `squad.ts`,
-`mascots.ts`, `navbar.ts`, `dashboard.ts`, `main.ts`.
+| Path | What it is |
+|------|-----------|
+| `src/squad.ts` | The roster — single source of truth for squad members. |
+| `src/mascots.ts` | One SVG builder per animal. |
+| `src/navbar.ts` | The animated "Deck" — mascots wander here. |
+| `src/dashboard.ts` | HQ panels: roster, mission control, comms feed. |
+| `src/main.ts` | Entry point — assembles the page. |
+| `.github/agents/` | The squad's Copilot agents (one `.agent.md` per member). |
+| `.github/prompts/` | Reusable skills, runnable as `/slash` commands. |
 
 ## Code conventions
 
-TODO: State the conventions Copilot must follow — TypeScript strict, no `any`,
-explicit types on exports, 2-space indent, single quotes, semicolons, comments
-explain *why* not *what*, never break the build (`npm run build` stays green).
+- **TypeScript strict.** No `any`. Type every export. No unused locals or params.
+- Prefer small pure functions and `const`. Use `interface` for object shapes.
+- Comments explain **why**, never **what**. Default to no comment.
+- 2-space indent, single quotes, semicolons. Match the surrounding file.
+- When you add a squad member, update `squad.ts` **and** add matching art in
+  `mascots.ts` **and** create `.github/agents/<id>.agent.md`. All three, or none.
+- Never break the build. `npm run build` must stay green.
 
 ## How the squad works
 
-TODO: Explain that each squad member is a custom agent in `.github/agents/`,
-reusable skills live in `.github/prompts/`, and each agent stays in its lane.
+Each squad member is a **custom agent** in `.github/agents/`. Each agent has a
+narrow job, a restricted tool set, and a personality. The **Captain** agent routes
+work to the right teammate. Reusable multi-step jobs live as **skills** (prompt
+files) in `.github/prompts/`.
+
+When you act as a squad agent: stay in your lane, do your one job well, and hand off
+explicitly when the work belongs to a teammate.

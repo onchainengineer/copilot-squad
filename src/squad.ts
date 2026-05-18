@@ -79,8 +79,16 @@ export const squad: SquadMember[] = [
     catchphrase: 'Squad — assemble.',
     quips: ['who has the ball?', 'good call, team', 'routing this one', 'standup in 5'],
   },
-  // The squad is missing its sixth member — a Scribe.
-  // You'll recruit Quill the owl in LAB 4 using the /recruit-squad-member skill.
+  {
+    id: 'quill',
+    name: 'Quill',
+    role: 'Scribe Agent',
+    animal: 'owl',
+    color: '#14b8a6',
+    specialty: 'Writes the docs, the comments, the READMEs. Makes the codebase make sense.',
+    catchphrase: 'If it isn’t written down, it didn’t happen.',
+    quips: ['drafting...', 'this needs a docstring', 'hoot — clarified', 'words words words'],
+  },
 ];
 
 export const getMember = (id: string): SquadMember | undefined =>
