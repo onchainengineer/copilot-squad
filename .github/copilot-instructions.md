@@ -22,7 +22,7 @@ packages.
 ## Project map
 
 TODO: A short table of what each file under `src/` does — `squad.ts`,
-`mascots.ts`, `navbar.ts`, `dashboard.ts`, `main.ts`.
+`mascots.ts`, `missions.ts`, `navbar.ts`, `dashboard.ts`, `main.ts`.
 
 ## Code conventions
 
