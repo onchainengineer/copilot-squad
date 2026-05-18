@@ -25,8 +25,8 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--ink);
   background:
-    radial-gradient(1100px 600px at 78% -8%, rgba(56, 84, 160, 0.28), transparent 60%),
-    radial-gradient(900px 520px at 8% 12%, rgba(120, 64, 160, 0.18), transparent 55%),
+    radial-gradient(1100px 600px at 78% -8%, rgba(56, 84, 160, 0.3), transparent 60%),
+    radial-gradient(900px 520px at 8% 12%, rgba(120, 64, 160, 0.2), transparent 55%),
     linear-gradient(180deg, var(--bg-1), var(--bg-0));
   background-attachment: fixed;
 }
@@ -42,9 +42,9 @@ code {
   display: flex;
   align-items: stretch;
   gap: 22px;
-  height: 152px;
+  height: 156px;
   padding: 0 26px;
-  background: linear-gradient(180deg, rgba(16, 22, 38, 0.95), rgba(12, 17, 30, 0.8));
+  background: linear-gradient(180deg, rgba(16, 22, 38, 0.96), rgba(12, 17, 30, 0.82));
   border-bottom: 1px solid var(--panel-line);
   box-shadow: 0 18px 50px -22px rgba(0, 0, 0, 0.9);
   position: sticky;
@@ -88,11 +88,9 @@ code {
   flex: 1;
   overflow: hidden;
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, transparent 62%, rgba(90, 120, 200, 0.1) 100%);
+  background: linear-gradient(180deg, transparent 60%, rgba(90, 120, 200, 0.12) 100%);
 }
 
-/* the "floor" the pets walk on */
 .deck-track::after {
   content: '';
   position: absolute;
@@ -110,12 +108,35 @@ code {
   left: 0;
   bottom: 12px;
   width: 66px;
-  height: 92px;
+  height: 96px;
   border: 0;
   background: none;
   padding: 0;
   cursor: pointer;
   will-change: transform;
+  transition: opacity 0.4s ease;
+}
+
+.pet::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 130px;
+  height: 130px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--accent), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.pet.active::before {
+  opacity: 0.4;
+}
+
+.pet.dim {
+  opacity: 0.24;
 }
 
 .pet-sprite {
@@ -123,6 +144,16 @@ code {
   width: 60px;
   height: 60px;
   margin: 0 auto;
+  transition: width 0.35s ease, height 0.35s ease;
+}
+
+.pet.active {
+  z-index: 5;
+}
+
+.pet.active .pet-sprite {
+  width: 80px;
+  height: 80px;
 }
 
 .pet-sprite svg {
@@ -132,8 +163,9 @@ code {
   transition: filter 0.2s ease;
 }
 
-.pet:hover .pet-sprite svg {
-  filter: drop-shadow(0 0 14px var(--accent)) drop-shadow(0 6px 8px rgba(0, 0, 0, 0.55));
+.pet:hover .pet-sprite svg,
+.pet.active .pet-sprite svg {
+  filter: drop-shadow(0 0 16px var(--accent)) drop-shadow(0 6px 8px rgba(0, 0, 0, 0.55));
 }
 
 .pet-tag {
@@ -148,17 +180,18 @@ code {
   transition: color 0.2s ease;
 }
 
-.pet:hover .pet-tag {
+.pet:hover .pet-tag,
+.pet.active .pet-tag {
   color: var(--accent);
 }
 
 .pet-bubble {
   position: absolute;
-  bottom: 86px;
+  bottom: 92px;
   left: 50%;
   transform: translateX(-50%) translateY(6px) scale(0.9);
   white-space: nowrap;
-  max-width: 220px;
+  max-width: 240px;
   padding: 6px 11px;
   font-size: 11.5px;
   font-weight: 600;
@@ -186,14 +219,33 @@ code {
   transform: translateX(-50%) translateY(0) scale(1);
 }
 
+/* the handoff token that flies between pets */
+.deck-token {
+  position: absolute;
+  bottom: 52px;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #6ad0ff 60%, #2f7fe0);
+  box-shadow: 0 0 14px 4px rgba(120, 200, 255, 0.85);
+  opacity: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.deck-token.show {
+  opacity: 1;
+}
+
 /* ── HQ layout ────────────────────────────────────────────── */
 
 .hq {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 38px 26px 10px;
+  padding: 30px 26px 10px;
   display: grid;
-  gap: 22px;
+  gap: 20px;
 }
 
 .panel {
@@ -212,7 +264,6 @@ code {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.13em;
-  color: var(--ink);
 }
 
 .panel-dot {
@@ -231,6 +282,48 @@ code {
 
 .panel-sub code {
   color: #9fb6ff;
+}
+
+/* ── HUD ──────────────────────────────────────────────────── */
+
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px 20px;
+  background: var(--panel);
+  border: 1px solid var(--panel-line);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.hud-num {
+  font-size: 30px;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #fff, #93a6da);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-num.bump {
+  animation: bump 0.45s ease;
+}
+
+.hud-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
 }
 
 /* ── Mission Control ──────────────────────────────────────── */
@@ -261,8 +354,12 @@ code {
   box-shadow: 0 0 0 3px rgba(80, 110, 220, 0.18);
 }
 
+.mc-input:disabled {
+  opacity: 0.55;
+}
+
 .mc-go {
-  padding: 0 20px;
+  padding: 0 22px;
   font-size: 13px;
   font-weight: 700;
   color: #fff;
@@ -270,66 +367,216 @@ code {
   border: 0;
   border-radius: 11px;
   cursor: pointer;
+  white-space: nowrap;
   transition: filter 0.16s ease, transform 0.08s ease;
 }
 
-.mc-go:hover {
+.mc-go:hover:not(:disabled) {
   filter: brightness(1.12);
 }
 
-.mc-go:active {
+.mc-go:active:not(:disabled) {
   transform: scale(0.97);
 }
 
-.mc-result {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  margin-top: 16px;
-  padding: 16px 18px;
-  border-radius: 13px;
-  background: rgba(8, 12, 22, 0.6);
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 26px -10px var(--accent);
-  animation: rise 0.3s ease;
+.mc-go:disabled {
+  filter: grayscale(0.5) brightness(0.8);
+  cursor: progress;
 }
 
-.mc-mascot {
-  width: 52px;
-  height: 52px;
+.mc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chip {
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  background: rgba(8, 12, 22, 0.55);
+  border: 1px solid var(--panel-line);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.chip:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: rgba(120, 150, 240, 0.6);
+  background: rgba(63, 107, 255, 0.14);
+}
+
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Mission run ──────────────────────────────────────────── */
+
+.run {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(8, 12, 22, 0.6);
+  border: 1px solid var(--panel-line);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.run.done {
+  border-color: rgba(74, 222, 128, 0.5);
+  box-shadow: 0 0 30px -10px rgba(74, 222, 128, 0.6);
+}
+
+/* stepper */
+.run-stepper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 13px 8px 9px;
+  border-radius: 11px;
+  border: 1px solid var(--panel-line);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.step .mini-mascot {
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
 }
 
-.mc-mascot svg {
-  width: 100%;
-  height: 100%;
+.step-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
 }
 
-.mc-verdict {
-  font-size: 14.5px;
+.step-info b {
+  font-size: 12.5px;
 }
 
-.mc-reason {
-  margin-top: 4px;
+.step-info em {
+  font-size: 10.5px;
+  font-style: normal;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.step.pending {
+  opacity: 0.5;
+}
+
+.step.running {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: 0 0 20px -6px var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.step.done {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.step.done .step-info em::after {
+  content: ' ✓';
+  color: #4ade80;
+}
+
+.step-link {
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--panel-line);
+  transition: background 0.3s ease;
+}
+
+.step-link.done {
+  background: linear-gradient(90deg, #4ade80, #6ad0ff);
+}
+
+/* mission log */
+.run-log {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+
+.run-log:empty::before {
+  content: 'Awaiting orders…';
+  color: var(--ink-faint);
+  font-size: 12.5px;
+  font-style: italic;
+}
+
+.log-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 9px;
   font-size: 13px;
+  border-left: 2px solid var(--accent);
+  animation: rise 0.3s ease;
+}
+
+.log-line .mini-mascot {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.log-agent {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 56px;
+}
+
+.log-text {
   color: var(--ink-dim);
 }
 
-.mc-hint {
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--ink-faint);
+.log-line.live {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
-.mc-hint code {
-  color: #9fb6ff;
+.log-line.live .log-text::after {
+  content: '▋';
+  margin-left: 2px;
+  color: var(--accent);
+  animation: blink 1s steps(2) infinite;
+}
+
+.run-banner {
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  animation: rise 0.4s ease;
 }
 
 /* ── Roster ───────────────────────────────────────────────── */
 
 .roster-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(284px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 14px;
 }
 
@@ -402,57 +649,53 @@ code {
   font-size: 10.5px;
 }
 
-.agent-status {
-  position: absolute;
-  top: 13px;
-  right: 14px;
-  color: #4ade80;
-  font-size: 11px;
-  filter: drop-shadow(0 0 5px #4ade80);
+.agent-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.agent-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 9px;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+}
+
+.agent-pill[data-status='idle'] {
+  color: var(--ink-faint);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.agent-pill[data-status='working'] {
+  color: #0c1120;
+  background: #fbbf24;
+  box-shadow: 0 0 14px -2px #fbbf24;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.agent-pill[data-status='done'] {
+  color: #0c1120;
+  background: #4ade80;
+}
+
+.agent-runs {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+
+.agent-runs b {
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
 }
 
 .agent-card.ping {
   animation: ping 0.7s ease;
-}
-
-/* ── Comms feed ───────────────────────────────────────────── */
-
-.comms-feed {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
-}
-
-.comms-line {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 7px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  border-left: 2px solid var(--accent);
-  animation: rise 0.3s ease;
-}
-
-.comms-line:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.022);
-}
-
-.comms-time {
-  font-size: 11px;
-  color: var(--ink-faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.comms-name {
-  font-weight: 700;
-  color: var(--accent);
-  min-width: 62px;
-}
-
-.comms-msg {
-  color: var(--ink-dim);
 }
 
 /* ── Footer ───────────────────────────────────────────────── */
@@ -479,22 +722,43 @@ code {
   }
 }
 
+@keyframes bump {
+  35% {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 @keyframes ping {
   40% {
     box-shadow: 0 0 0 4px var(--accent), 0 0 36px -6px var(--accent);
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 620px) {
   .deck {
-    height: 138px;
+    height: 142px;
     padding: 0 16px;
   }
   .deck-brand p {
     display: none;
   }
   .hq {
-    padding: 24px 14px 10px;
+    padding: 22px 14px 10px;
+  }
+  .hud {
+    grid-template-columns: 1fr;
   }
   .mc-form {
     flex-direction: column;

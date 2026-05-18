@@ -22,9 +22,10 @@ AI agents as animated mascot "pets" that wander a navbar. It is the playground f
 |------|-----------|
 | `src/squad.ts` | The roster — single source of truth for squad members. |
 | `src/mascots.ts` | One SVG builder per animal. |
-| `src/navbar.ts` | The animated "Deck" — mascots wander here. |
-| `src/dashboard.ts` | HQ panels: roster, mission control, comms feed. |
-| `src/main.ts` | Entry point — assembles the page. |
+| `src/missions.ts` | The mission engine — plans a route and runs it as a live relay. |
+| `src/navbar.ts` | The animated "Deck" — mascots wander, spotlight, hand off. |
+| `src/dashboard.ts` | HQ panels: HUD, mission control, roster. |
+| `src/main.ts` | Entry point — wires every panel to the shared MissionEngine. |
 | `.github/agents/` | The squad's Copilot agents (one `.agent.md` per member). |
 | `.github/prompts/` | Reusable skills, runnable as `/slash` commands. |
 

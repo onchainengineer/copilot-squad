@@ -35,9 +35,10 @@ If you skip this, you lose 10 minutes to setup. Don't skip it.
 
 ### 0:00–0:04 · Hook + concept (4 min)
 
-- Show **Squad HQ** running. Hover a pet — it talks. Click one — it jumps to its
-  card. Type a mission into Mission Control, hit *Route it* — Captain picks an
-  agent. Let the room react.
+- Show **Squad HQ** running. Hover a pet — it talks. Click a sample mission chip in
+  Mission Control and let it rip: the squad runs a live relay — Scout strides into
+  the spotlight, hands a glowing token to Hammer, then Hawk — reports stream in, the
+  HUD counters tick up. Let the room react.
 - The reveal: **"Every pet is a real Copilot agent. Its brain is a file in
   `.github/`. The sixth pet is missing — you'll hire it by minute 40."**
 - Name the four ideas on one slide: **Instructions · Agents · Skills ·
