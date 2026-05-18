@@ -58,6 +58,7 @@
     ],
     "menus": {
       "view/title": [
+        { "command": "commandCentre.setup", "when": "view == commandCentre.roster", "group": "navigation@0" },
         { "command": "commandCentre.askSquad", "when": "view == commandCentre.roster", "group": "navigation@1" },
         { "command": "commandCentre.recruit", "when": "view == commandCentre.roster", "group": "navigation@3" },
         { "command": "commandCentre.refresh", "when": "view == commandCentre.roster", "group": "navigation@4" }
