@@ -12,7 +12,8 @@ import './style.css';
 import { squad } from './squad';
 import { MissionEngine } from './missions';
 import { mountDeck } from './navbar';
-import { renderHud, renderMissionControl, renderRoster } from './dashboard';
+import { mountArchitecture } from './architecture';
+import { renderHud, renderMissionControl } from './dashboard';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 const engine = new MissionEngine();
@@ -31,20 +32,20 @@ app.innerHTML = `
   </header>
 
   <main class="hq">
+    <section class="panel">
+      <span class="eyebrow">The Army</span>
+      <h2><span class="panel-dot"></span>Command architecture</h2>
+      <p class="panel-sub lede">Six soldiers, one chain of command. Every soldier is a real Copilot agent — its brain lives in <code>.github/agents/</code>. The Captain orchestrates; the rest hold the line.</p>
+      <div id="architecture"></div>
+    </section>
+
     <section class="hud" id="hud"></section>
 
     <section class="panel">
       <span class="eyebrow">Mission Control</span>
       <h2><span class="panel-dot"></span>Deploy the army</h2>
-      <p class="panel-sub lede">Hand the army a task. Watch them run it as a live relay — recon, build, review — with real handoffs.</p>
+      <p class="panel-sub lede">Hand the army a task. Watch the relay run across the architecture — recon, build, review — with real handoffs.</p>
       <div id="mission-control"></div>
-    </section>
-
-    <section class="panel">
-      <span class="eyebrow">The Roster</span>
-      <h2><span class="panel-dot"></span>Agents on duty</h2>
-      <p class="panel-sub lede">Every soldier is a real Copilot agent — its brain lives in <code>.github/agents/</code>.</p>
-      <div class="roster-grid" id="roster"></div>
     </section>
   </main>
 
@@ -53,14 +54,14 @@ app.innerHTML = `
   </footer>`;
 
 mountDeck(document.querySelector<HTMLElement>('#deck-track')!, engine, (id) => {
-  const card = document.querySelector(`#card-${id}`);
-  if (!card) return;
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  card.classList.remove('ping');
-  void (card as HTMLElement).offsetWidth;
-  card.classList.add('ping');
+  const node = document.querySelector(`#node-${id}`);
+  if (!node) return;
+  node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  node.classList.remove('ping');
+  void (node as HTMLElement).offsetWidth;
+  node.classList.add('ping');
 });
 
+mountArchitecture(document.querySelector<HTMLElement>('#architecture')!, engine);
 renderHud(document.querySelector<HTMLElement>('#hud')!, engine);
 renderMissionControl(document.querySelector<HTMLElement>('#mission-control')!, engine);
-renderRoster(document.querySelector<HTMLElement>('#roster')!, engine);
