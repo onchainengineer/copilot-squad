@@ -54,6 +54,23 @@ wandering a navbar. ✅ You're ready.
 
 ---
 
+## The VS Code extension
+
+The repo also ships a companion **VS Code extension** in [`extension/`](extension/) —
+install it and you have your own Copilot Squad inside the editor:
+
+- a `@squad` **Copilot Chat participant** that routes any task to the right agent
+- an animated **Squad HQ** command center where the mascots react to your edits
+- a **Squad sidebar** and one-click **Set Up / Recruit** scaffolding
+
+```bash
+cd extension && npm install && npm run compile   # then press F5 to launch
+```
+
+See [`extension/README.md`](extension/README.md) for the full tour.
+
+---
+
 ## The two branches
 
 | Branch | What it is |

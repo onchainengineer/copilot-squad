@@ -1,0 +1,114 @@
+{
+  "name": "copilot-squad",
+  "displayName": "Copilot Squad",
+  "description": "Your own squad of GitHub Copilot agents — mascot companions, a routing @squad chat participant, and one-click agent scaffolding.",
+  "version": "0.1.0",
+  "publisher": "copilot-squad",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": ["AI", "Chat", "Other"],
+  "keywords": ["copilot", "agents", "chat", "mascot", "workshop"],
+  "main": "./out/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "copilot-squad.squad",
+        "name": "squad",
+        "fullName": "Copilot Squad",
+        "description": "Hand the squad a task — the Captain routes it to the right agent",
+        "isSticky": true,
+        "commands": [
+          { "name": "roster", "description": "List every agent in the squad" },
+          { "name": "recruit", "description": "Scaffold a brand-new squad agent" }
+        ]
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "copilotSquad",
+          "title": "Copilot Squad",
+          "icon": "media/squad-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "copilotSquad": [
+        { "id": "copilotSquad.roster", "name": "Squad", "icon": "media/squad-icon.svg" },
+        { "id": "copilotSquad.skills", "name": "Skills" }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "copilotSquad.roster",
+        "contents": "This workspace has no Copilot Squad yet.\n\nDeploy a full squad of agents into `.github/` with one click.\n[Set Up the Squad](command:copilotSquad.setup)\n\nOr open the animated HQ to meet them first.\n[Open Squad HQ](command:copilotSquad.openHQ)"
+      }
+    ],
+    "commands": [
+      { "command": "copilotSquad.openHQ", "title": "Open Squad HQ", "category": "Copilot Squad", "icon": "$(window)" },
+      { "command": "copilotSquad.setup", "title": "Set Up the Squad in This Workspace", "category": "Copilot Squad", "icon": "$(rocket)" },
+      { "command": "copilotSquad.recruit", "title": "Recruit a New Agent", "category": "Copilot Squad", "icon": "$(add)" },
+      { "command": "copilotSquad.refresh", "title": "Refresh the Squad", "category": "Copilot Squad", "icon": "$(refresh)" },
+      { "command": "copilotSquad.openAgent", "title": "Open Agent File", "category": "Copilot Squad" },
+      { "command": "copilotSquad.askSquad", "title": "Ask the Squad (@squad)", "category": "Copilot Squad", "icon": "$(comment-discussion)" },
+      { "command": "copilotSquad.runSkill", "title": "Run Skill", "category": "Copilot Squad" }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "copilotSquad.askSquad", "when": "view == copilotSquad.roster", "group": "navigation@1" },
+        { "command": "copilotSquad.openHQ", "when": "view == copilotSquad.roster", "group": "navigation@2" },
+        { "command": "copilotSquad.recruit", "when": "view == copilotSquad.roster", "group": "navigation@3" },
+        { "command": "copilotSquad.refresh", "when": "view == copilotSquad.roster", "group": "navigation@4" }
+      ],
+      "view/item/context": [
+        { "command": "copilotSquad.askSquad", "when": "view == copilotSquad.roster && viewItem == agent", "group": "inline" }
+      ]
+    },
+    "walkthroughs": [
+      {
+        "id": "copilotSquad.gettingStarted",
+        "title": "Assemble Your Copilot Squad",
+        "description": "Deploy a squad of custom GitHub Copilot agents and put them to work.",
+        "steps": [
+          {
+            "id": "meet",
+            "title": "Meet the squad",
+            "description": "Open the animated Squad HQ and meet your six agent mascots.\n[Open Squad HQ](command:copilotSquad.openHQ)",
+            "media": { "markdown": "walkthrough/01-meet.md" }
+          },
+          {
+            "id": "setup",
+            "title": "Deploy the squad",
+            "description": "Scaffold the agent files into this workspace's `.github/` folder.\n[Set Up the Squad](command:copilotSquad.setup)",
+            "media": { "markdown": "walkthrough/02-setup.md" }
+          },
+          {
+            "id": "ask",
+            "title": "Put them to work",
+            "description": "Open Copilot Chat and hand the squad a mission with `@squad`.\n[Ask the Squad](command:copilotSquad.askSquad)",
+            "media": { "markdown": "walkthrough/03-ask.md" }
+          },
+          {
+            "id": "recruit",
+            "title": "Recruit your own agent",
+            "description": "Build a brand-new teammate, tuned to your project.\n[Recruit an Agent](command:copilotSquad.recruit)",
+            "media": { "markdown": "walkthrough/04-recruit.md" }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.96.0",
+    "typescript": "^5.6.0"
+  }
+}
