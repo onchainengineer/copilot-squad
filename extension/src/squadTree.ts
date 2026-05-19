@@ -1,67 +1,76 @@
 /**
  * The Activity Bar sidebar — the army, shown natively in VS Code.
  *
- * The "Army" tree is a clean flat list: one row per agent, with a live status.
- * Hover an agent for a rich card — its blurb, tools, handoffs, and skills.
- * Click opens its `.agent.md`. The "Skills" tree lists every prompt-file skill.
+ * The "Army" tree is grouped into categories: "Squad" (the built-in agents)
+ * and "Custom" (any `.agent.md` you create yourself). Each agent is one clean
+ * row with a live status; hover for a rich card (blurb, tools, handoffs,
+ * skills). The "Skills" tree lists every prompt-file skill.
  */
 
 import * as vscode from 'vscode';
-import {
-  SQUAD,
-  type SquadAgent,
-  findAgentFiles,
-  findSkillFiles,
-  readAgentMeta,
-  readSkills,
-  type AgentMeta,
-} from './squadData';
+import { discoverArmy, readSkills, findSkillFiles, type ArmyAgent } from './squadData';
 
-/* ── Army roster tree (flat — detail lives in the tooltip) ── */
+/* ── Army roster tree (categorised) ───────────────────────── */
 
 class AgentItem extends vscode.TreeItem {
+  readonly kind = 'agent' as const;
   constructor(
     public readonly agentId: string,
-    agent: SquadAgent,
-    recruited: boolean,
+    public readonly builtin: boolean,
+    agent: ArmyAgent,
     status: string | undefined,
-    meta: AgentMeta,
     skills: string[],
-    fileUri?: vscode.Uri,
   ) {
     super(`${agent.emoji}  ${agent.name}`, vscode.TreeItemCollapsibleState.None);
     const working = status === 'working';
-    this.description = recruited
+    this.description = agent.recruited
       ? working
         ? `${agent.role}  ·  working…`
         : agent.role
       : 'not recruited yet';
-    this.contextValue = recruited ? 'agent' : 'agentMissing';
+    this.contextValue = agent.recruited ? 'agent' : 'agentMissing';
     this.iconPath = new vscode.ThemeIcon(
-      working ? 'loading~spin' : recruited ? 'pass-filled' : 'circle-large-outline',
+      working ? 'loading~spin' : agent.recruited ? 'pass-filled' : 'circle-large-outline',
     );
 
     const md = new vscode.MarkdownString();
     md.appendMarkdown(`**${agent.emoji} ${agent.name}** — ${agent.role}\n\n${agent.blurb}\n\n`);
-    if (recruited) {
-      md.appendMarkdown(`**Tools** · ${meta.tools.length ? meta.tools.join(', ') : '—'}\n\n`);
-      md.appendMarkdown(`**Handoffs** · ${meta.handoffs.length ? meta.handoffs.join(', ') : '—'}\n\n`);
+    if (agent.recruited) {
+      md.appendMarkdown(`**Tools** · ${agent.tools.length ? agent.tools.join(', ') : '—'}\n\n`);
+      md.appendMarkdown(
+        `**Handoffs** · ${agent.handoffs.length ? agent.handoffs.join(', ') : '—'}\n\n`,
+      );
       md.appendMarkdown(`**Skills** · ${skills.length ? skills.join('  ') : '—'}`);
     } else {
       md.appendMarkdown(`_Not recruited — run **Set Up the Army** to deploy this agent._`);
     }
     this.tooltip = md;
 
-    if (recruited && fileUri) {
-      this.command = { command: 'vscode.open', title: 'Open agent file', arguments: [fileUri] };
-      this.resourceUri = fileUri;
+    if (agent.recruited && agent.fileUri) {
+      this.command = {
+        command: 'vscode.open',
+        title: 'Open agent file',
+        arguments: [agent.fileUri],
+      };
+      this.resourceUri = agent.fileUri;
     } else {
       this.command = { command: 'commandCentre.setup', title: 'Set up the army' };
     }
   }
 }
 
-export class SquadTreeProvider implements vscode.TreeDataProvider<AgentItem> {
+class CategoryNode extends vscode.TreeItem {
+  readonly kind = 'category' as const;
+  constructor(label: string, public readonly items: AgentItem[]) {
+    super(label, vscode.TreeItemCollapsibleState.Expanded);
+    this.description = String(items.length);
+    this.contextValue = 'category';
+  }
+}
+
+type Node = CategoryNode | AgentItem;
+
+export class SquadTreeProvider implements vscode.TreeDataProvider<Node> {
   private readonly changed = new vscode.EventEmitter<void>();
   readonly onDidChangeTreeData = this.changed.event;
   private readonly statuses = new Map<string, string>();
@@ -77,29 +86,31 @@ export class SquadTreeProvider implements vscode.TreeDataProvider<AgentItem> {
     this.changed.fire();
   }
 
-  getTreeItem(item: AgentItem): vscode.TreeItem {
-    return item;
+  getTreeItem(node: Node): vscode.TreeItem {
+    return node;
   }
 
-  async getChildren(): Promise<AgentItem[]> {
-    const files = await findAgentFiles();
-    const byId = new Map(
-      files.map((uri) => [uri.path.split('/').pop()!.replace('.agent.md', ''), uri]),
-    );
+  async getChildren(element?: Node): Promise<Node[]> {
+    if (element) return element.kind === 'category' ? element.items : [];
+
+    const army = await discoverArmy();
     const skills = await readSkills();
-    const items: AgentItem[] = [];
-    for (const agent of SQUAD) {
-      const uri = byId.get(agent.id);
-      const recruited = Boolean(uri);
-      const meta = recruited ? await readAgentMeta(agent.id) : { tools: [], handoffs: [] };
-      const mySkills = skills
-        .filter((s) => s.agent.toLowerCase() === agent.name.toLowerCase())
-        .map((s) => `/${s.name}`);
-      items.push(
-        new AgentItem(agent.id, agent, recruited, this.statuses.get(agent.id), meta, mySkills, uri),
+    const toItem = (a: ArmyAgent) =>
+      new AgentItem(
+        a.id,
+        a.builtin,
+        a,
+        this.statuses.get(a.id),
+        skills
+          .filter((s) => s.agent.toLowerCase() === a.name.toLowerCase())
+          .map((s) => `/${s.name}`),
       );
-    }
-    return items;
+
+    const builtin = army.filter((a) => a.builtin).map(toItem);
+    const custom = army.filter((a) => !a.builtin).map(toItem);
+    const categories: Node[] = [new CategoryNode('Squad', builtin)];
+    if (custom.length) categories.push(new CategoryNode('Custom', custom));
+    return categories;
   }
 }
 

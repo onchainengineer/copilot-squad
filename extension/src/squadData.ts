@@ -199,26 +199,33 @@ async function readText(uri: vscode.Uri): Promise<string> {
 }
 
 export interface AgentMeta {
+  name: string;
+  description: string;
   tools: string[];
   handoffs: string[];
 }
 
-/** Tools + handoff targets declared in an agent's `.agent.md` frontmatter. */
+const EMPTY_META: AgentMeta = { name: '', description: '', tools: [], handoffs: [] };
+
+/** Name, description, tools and handoff targets from an `.agent.md` frontmatter. */
 export async function readAgentMeta(id: string): Promise<AgentMeta> {
   const root = workspaceRoot();
-  if (!root) return { tools: [], handoffs: [] };
+  if (!root) return EMPTY_META;
   const fm = frontmatter(
     await readText(vscode.Uri.joinPath(root, '.github/agents', `${id}.agent.md`)),
   );
-  const toolsMatch = fm.match(/^tools:\s*\[([^\]]*)\]/m);
-  const tools = toolsMatch
-    ? toolsMatch[1]
-        .split(',')
-        .map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
-        .filter(Boolean)
-    : [];
+  if (!fm) return EMPTY_META;
+  const tools = (fm.match(/^tools:\s*\[([^\]]*)\]/m)?.[1] ?? '')
+    .split(',')
+    .map((t) => t.trim().replace(/^['"]|['"]$/g, ''))
+    .filter(Boolean);
   const handoffs = [...fm.matchAll(/^\s+agent:\s*['"]?([A-Za-z][\w-]*)['"]?/gm)].map((m) => m[1]);
-  return { tools, handoffs: [...new Set(handoffs)] };
+  return {
+    name: (fm.match(/^name:\s*(.+)$/m)?.[1] ?? '').trim(),
+    description: (fm.match(/^description:\s*(.+)$/m)?.[1] ?? '').trim(),
+    tools,
+    handoffs: [...new Set(handoffs)],
+  };
 }
 
 export interface SkillRef {
@@ -239,6 +246,74 @@ export async function readSkills(): Promise<SkillRef[]> {
       name: nameMatch ? nameMatch[1] : uri.path.split('/').pop()!.replace('.prompt.md', ''),
       agent: agentMatch ? agentMatch[1] : 'agent',
       uri,
+    });
+  }
+  return out;
+}
+
+/* ── The full army — built-in squad + any custom agents found ── */
+
+export interface ArmyAgent {
+  id: string;
+  name: string;
+  role: string;
+  emoji: string;
+  color: string;
+  blurb: string;
+  /** true for the six built-in agents, false for user-created ones */
+  builtin: boolean;
+  /** true if a `.agent.md` file exists for it */
+  recruited: boolean;
+  fileUri?: vscode.Uri;
+  tools: string[];
+  handoffs: string[];
+}
+
+/**
+ * Discovers the full army: the six built-in agents (recruited or not) plus
+ * every custom `.agent.md` file in the workspace that isn't one of them.
+ */
+export async function discoverArmy(): Promise<ArmyAgent[]> {
+  const files = await findAgentFiles();
+  const byId = new Map(
+    files.map((u) => [u.path.split('/').pop()!.replace('.agent.md', ''), u]),
+  );
+  const builtinIds = new Set(SQUAD.map((a) => a.id));
+  const out: ArmyAgent[] = [];
+
+  for (const a of SQUAD) {
+    const uri = byId.get(a.id);
+    const meta = uri ? await readAgentMeta(a.id) : EMPTY_META;
+    out.push({
+      id: a.id,
+      name: a.name,
+      role: a.role,
+      emoji: a.emoji,
+      color: a.color,
+      blurb: a.blurb,
+      builtin: true,
+      recruited: Boolean(uri),
+      fileUri: uri,
+      tools: meta.tools,
+      handoffs: meta.handoffs,
+    });
+  }
+
+  for (const [id, uri] of byId) {
+    if (builtinIds.has(id)) continue;
+    const meta = await readAgentMeta(id);
+    out.push({
+      id,
+      name: meta.name || id,
+      role: 'Custom Agent',
+      emoji: '🎖️',
+      color: '#64748b',
+      blurb: meta.description || 'A custom agent you created.',
+      builtin: false,
+      recruited: true,
+      fileUri: uri,
+      tools: meta.tools,
+      handoffs: meta.handoffs,
     });
   }
   return out;
